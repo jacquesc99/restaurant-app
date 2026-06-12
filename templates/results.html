@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .safe {
+            border-left: 6px solid #2ecc71;
+        }
+
+        .modified {
+            border-left: 6px solid #f39c12;
+        }
+
+        .dish-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .status {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2d6cdf;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Results</h1>
+
+{% if results %}
+
+    {% for item in results %}
+
+        <div class="card {% if item.modified %}modified{% else %}safe{% endif %}">
+
+            <div class="dish-name">
+                {{ item.dish }}
+            </div>
+
+            {% if item.modified %}
+
+                <div class="status">
+                    ⚠ Modified version (safe with changes):
+                </div>
+
+                <ul>
+                    {% for mod in item.modifications %}
+                        <li>{{ mod }}</li>
+                    {% endfor %}
+                </ul>
+
+            {% else %}
+
+                <div class="status">
+                    ✅ Safe as-is
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No matching dishes found.</p>
+
+{% endif %}
+
+<a class="back" href="/">← Back to filters</a>
+
+</body>
+</html>

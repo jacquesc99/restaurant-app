@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ambrogio PB Allergen & Dietary Filter</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .group-title {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 14px;
+            margin: 6px;
+            border: 1px solid #ddd;
+            border-radius: 999px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            font-size: 14px;
+            user-select: none;
+            transition: 0.2s;
+        }
+
+        .pill input {
+            display: none;
+        }
+
+        .pill:has(input:checked) {
+            background-color: #2d6cdf;
+            color: white;
+            border-color: #2d6cdf;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: none;
+            background: #2d6cdf;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1f4fbf;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Select Allergens & Dietary Preferences</h1>
+
+<form method="POST">
+
+    <div class="group-title">Meat Restrictions</div>
+    <label class="pill"><input type="checkbox" name="allergens" value="pork">Pork</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="beef">Beef</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="chicken">Poultry</label>
+
+    <div class="group-title">Common Allergens</div>
+    <label class="pill"><input type="checkbox" name="allergens" value="egg">Egg</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="dairy">Dairy</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="fish">Fish</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="shellfish">Shellfish</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="gluten">Gluten</label>
+
+    <div class="group-title">Nuts & Seeds</div>
+    <label class="pill"><input type="checkbox" name="allergens" value="peanuts">Peanuts</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="tree nuts">Tree Nuts</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="soy">Soy</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="sesame">Sesame</label>
+
+    <div class="group-title">Spice Sensitivity</div>
+    <label class="pill"><input type="checkbox" name="allergens" value="capsaicin">Capsaicin</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="piperine">Piperine</label>
+
+    <div class="group-title">Dietary Preferences</div>
+    <label class="pill"><input type="checkbox" name="allergens" value="vegetarian">Vegetarian</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="vegan">Vegan</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="pregnancy safe"> Pregnancy Safe</label>
+
+    <button type="submit">Find Safe Dishes</button>
+
+</form>
+
+</body>
+</html>
