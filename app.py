@@ -28,6 +28,8 @@ class Restaurant(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return Restaurant.query.get(int(user_id))
+with app.app_context():
+    db.create_all()
 
 # ── Routes ───────────────────────────────────────────────
 
