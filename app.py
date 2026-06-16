@@ -194,26 +194,13 @@ def menu(slug):
                     "dish": row['dish'],
                     "modified": False
                 })
-            elif pd.notna(row.get('alternatives')) and str(row.get('alternatives')).strip():
-                triggered = []
-                for a in selected_allergens:
-                    if a in EXCLUDE_IF_TRUE and row.get(a) == True:
-                        triggered.append(a)
-                    if a in REQUIRE_TRUE and row.get(a) != True:
-                        triggered.append(a)
-
-                all_alts = [a.strip() for a in str(row['alternatives']).split('|')]
-                relevant_alts = [
-                    alt for alt in all_alts
-                    if any(t in alt.lower() for t in triggered)
-                ]
-
-                if relevant_alts:
-                    safe_results.append({
-                        "dish": row['dish'],
-                        "modified": True,
-                        "modifications": relevant_alts
-                    })
+    elif pd.notna(row.get('alternatives')) and str(row.get('alternatives')).strip():
+        all_alts = [a.strip() for a in str(row['alternatives']).split('|')]
+        safe_results.append({
+            "dish": row['dish'],
+            "modified": True,
+            "modifications": all_alts
+        })
 
         return render_template('results.html', results=safe_results, restaurant=restaurant)
 
