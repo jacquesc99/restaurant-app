@@ -1,11 +1,10 @@
 import os
+import io
 import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-import io
 
 app = Flask(__name__)
 from config import Config
@@ -23,10 +22,12 @@ class Restaurant(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
     csv_data = db.Column(db.Text, nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
 @login_manager.user_loader
 def load_user(user_id):
     return Restaurant.query.get(int(user_id))
+
 with app.app_context():
     db.create_all()
 
@@ -36,7 +37,6 @@ with app.app_context():
 def home():
     return render_template('home.html')
 
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -44,7 +44,6 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        # Make slug unique if it already exists
         base_slug = name.lower().replace(' ', '-')
         slug = base_slug
         counter = 1
@@ -80,7 +79,10 @@ def login():
             flash('Invalid email or password.')
             return redirect(url_for('login'))
 
-        login_user(restaurant)
+        login_user(restaurant, remember=True)
+
+        if restaurant.is_admin:                            # ← step 5
+            return redirect(url_for('admin_dashboard'))
         return redirect(url_for('dashboard'))
 
     return render_template('login.html')
@@ -109,11 +111,21 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Access denied.')
+        return redirect(url_for('dashboard'))
+
+    restaurants = Restaurant.query.filter_by(is_admin=False).all()
+    return render_template('admin.html', restaurants=restaurants)
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     if request.method == 'POST':
-        file = request.files.get('csv_files')  # ← change to csv_files
+        file = request.files.get('csv_files')
         if file and file.filename.endswith('.csv'):
             csv_content = file.read().decode('utf-8')
             current_user.csv_data = csv_content
@@ -148,7 +160,6 @@ def menu(slug):
     allergens = [col for col in df.columns if col not in NON_ALLERGEN_COLUMNS]
     safe_results = []
 
-
     if request.method == 'POST':
         selected_allergens = [a.lower() for a in request.form.getlist('allergens')]
 
@@ -169,8 +180,12 @@ def menu(slug):
                     break
             if is_safe:
                 safe_results.append({"dish": row['dish']})
+            elif row.get('alternatives'):
+                alternative_results.append({
+                    "dish": row['dish'],
+                    "alternatives": [a.strip() for a in str(row['alternatives']).split('|')]
+                })
 
         return render_template('results.html', results=safe_results, restaurant=restaurant)
 
     return render_template('index.html', allergens=allergens, restaurant=restaurant)
-
