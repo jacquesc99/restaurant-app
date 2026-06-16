@@ -186,15 +186,27 @@ def menu(slug):
                     "dish": row['dish'],
                     "modified": False
                 })
-            elif row.get('alternatives'):
-                safe_results.append({
-                    "dish": row['dish'],
-                    "modified": True,
-                    "modifications": [a.strip() for a in str(row['alternatives']).split('|')]
-                })
+            elif pd.notna(row.get('alternatives')) and str(row.get('alternatives')).strip():
+                # find which selected allergens triggered the fail
+                triggered = []
+                for a in selected_allergens:
+                    if a in EXCLUDE_IF_TRUE and row.get(a) == True:
+                        triggered.append(a)
+                    if a in REQUIRE_TRUE and row.get(a) != True:
+                        triggered.append(a)
 
-        return render_template('results.html', results=safe_results, restaurant=restaurant)
+                # only show alternatives that mention the triggered allergen
+                all_alts = [a.strip() for a in str(row['alternatives']).split('|')]
+                relevant_alts = [
+                    alt for alt in all_alts
+                    if any(t in alt.lower() for t in triggered)
+                ]
 
-        #return render_template('results.html', results=safe_results, restaurant=restaurant)
+                if relevant_alts:
+                    safe_results.append({
+                        "dish": row['dish'],
+                        "modified": True,
+                        "modifications": relevant_alts
+                    })
 
     return render_template('index.html', allergens=allergens, restaurant=restaurant)
