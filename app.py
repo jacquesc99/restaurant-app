@@ -30,7 +30,11 @@ def load_user(user_id):
 
 with app.app_context():
     db.create_all()
-
+    try:
+        db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
+        db.session.commit()
+    except:
+        db.session.rollback()
 # ── Routes ───────────────────────────────────────────────
 
 @app.route('/')
