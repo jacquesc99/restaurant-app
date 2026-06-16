@@ -195,7 +195,6 @@ def menu(slug):
                     "modified": False
                 })
             elif pd.notna(row.get('alternatives')) and str(row.get('alternatives')).strip():
-                # find which selected allergens triggered the fail
                 triggered = []
                 for a in selected_allergens:
                     if a in EXCLUDE_IF_TRUE and row.get(a) == True:
@@ -203,7 +202,6 @@ def menu(slug):
                     if a in REQUIRE_TRUE and row.get(a) != True:
                         triggered.append(a)
 
-                # only show alternatives that mention the triggered allergen
                 all_alts = [a.strip() for a in str(row['alternatives']).split('|')]
                 relevant_alts = [
                     alt for alt in all_alts
@@ -217,7 +215,6 @@ def menu(slug):
                         "modifications": relevant_alts
                     })
 
+        return render_template('results.html', results=safe_results, restaurant=restaurant)
 
-if request.method == 'POST':
-    return render_template('results.html', results=safe_results, restaurant=restaurant)
-return render_template('index.html', allergens=allergens, restaurant=restaurant)
+    return render_template('index.html', allergens=allergens, restaurant=restaurant)
