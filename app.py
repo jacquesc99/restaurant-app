@@ -8,9 +8,8 @@ from werkzeug.utils import secure_filename
 import io
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'changeme123')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///local.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+from config import Config
+app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -37,13 +36,21 @@ with app.app_context():
 def home():
     return render_template('home.html')
 
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-        slug = name.lower().replace(' ', '-')
+
+        # Make slug unique if it already exists
+        base_slug = name.lower().replace(' ', '-')
+        slug = base_slug
+        counter = 1
+        while Restaurant.query.filter_by(slug=slug).first():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
 
         if Restaurant.query.filter_by(email=email).first():
             flash('Email already registered.')
@@ -114,7 +121,9 @@ def dashboard():
             flash('Menu uploaded successfully!')
         else:
             flash('Please upload a valid CSV file.')
-    return render_template('dashboard.html', restaurant=current_user)
+
+    menu_url = url_for('menu', slug=current_user.slug, _external=True)
+    return render_template('dashboard.html', restaurant=current_user, menu_url=menu_url)
 
 @app.route('/menu/<slug>', methods=['GET', 'POST'])
 def menu(slug):

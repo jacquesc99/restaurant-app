@@ -92,6 +92,11 @@
   </div>
   {% endif %}
 
+
+
   <a class="logout-link" href="/logout">Logout</a>
+
+<p>Your menu link: <strong>{{ menu_url }}</strong></p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?data={{ menu_url }}&size=200x200" />
 </body>
 </html>
