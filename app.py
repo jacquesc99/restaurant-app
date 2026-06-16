@@ -125,9 +125,13 @@ def admin_dashboard():
     restaurants = Restaurant.query.filter_by(is_admin=False).all()
     return render_template('admin.html', restaurants=restaurants)
 
+
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    if current_user.is_admin:
+        return redirect(url_for('admin_dashboard'))
+
     if request.method == 'POST':
         file = request.files.get('csv_files')
         if file and file.filename.endswith('.csv'):
@@ -213,4 +217,7 @@ def menu(slug):
                         "modifications": relevant_alts
                     })
 
-    return render_template('index.html', allergens=allergens, restaurant=restaurant)
+
+if request.method == 'POST':
+    return render_template('results.html', results=safe_results, restaurant=restaurant)
+return render_template('index.html', allergens=allergens, restaurant=restaurant)
