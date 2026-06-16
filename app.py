@@ -169,6 +169,8 @@ def menu(slug):
                            'cured meats']
         REQUIRE_TRUE = ['vegetarian', 'vegan', 'pregnancy safe']
 
+        safe_results = []
+
         for _, row in df.iterrows():
             is_safe = True
             for a in selected_allergens:
@@ -178,14 +180,21 @@ def menu(slug):
                 if a in REQUIRE_TRUE and row.get(a) != True:
                     is_safe = False
                     break
+
             if is_safe:
-                safe_results.append({"dish": row['dish']})
-            elif row.get('alternatives'):
-                alternative_results.append({
+                safe_results.append({
                     "dish": row['dish'],
-                    "alternatives": [a.strip() for a in str(row['alternatives']).split('|')]
+                    "modified": False
+                })
+            elif row.get('alternatives'):
+                safe_results.append({
+                    "dish": row['dish'],
+                    "modified": True,
+                    "modifications": [a.strip() for a in str(row['alternatives']).split('|')]
                 })
 
         return render_template('results.html', results=safe_results, restaurant=restaurant)
+
+        #return render_template('results.html', results=safe_results, restaurant=restaurant)
 
     return render_template('index.html', allergens=allergens, restaurant=restaurant)
