@@ -113,7 +113,7 @@ def logout():
 @login_required
 def dashboard():
     if request.method == 'POST':
-        file = request.files.get('csv_file')
+        file = request.files.get('csv_files')  # ← change to csv_files
         if file and file.filename.endswith('.csv'):
             csv_content = file.read().decode('utf-8')
             current_user.csv_data = csv_content
