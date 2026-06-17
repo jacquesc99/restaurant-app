@@ -154,7 +154,7 @@ def menu(slug):
 
     df = pd.read_csv(io.StringIO(restaurant.csv_data), sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
-    NON_ALLERGEN_COLUMNS = ['dish', 'category']
+    NON_ALLERGEN_COLUMNS = ['dish', 'category', 'alternatives']
 
     for col in df.columns:
         if col not in NON_ALLERGEN_COLUMNS:
