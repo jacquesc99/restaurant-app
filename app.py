@@ -24,6 +24,11 @@ class Restaurant(UserMixin, db.Model):
     csv_data = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
 
+@app.route('/restaurants')
+def restaurants():
+    all_restaurants = Restaurant.query.filter_by(is_admin=False).all()
+    return render_template('restaurants.html', restaurants=all_restaurants)
+
 @login_manager.user_loader
 def load_user(user_id):
     return Restaurant.query.get(int(user_id))
