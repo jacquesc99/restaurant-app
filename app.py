@@ -175,6 +175,7 @@ def menu(slug):
                            'gluten', 'peanuts', 'tree nuts', 'soy', 'sesame', 'capsaicin',
                            'piperine', 'unpasteurized (raw) cheese', 'derived protiens',
                            'cured meats']
+
         REQUIRE_TRUE = ['vegetarian', 'vegan', 'pregnancy safe']
 
         for _, row in df.iterrows():
@@ -193,8 +194,11 @@ def menu(slug):
                     "modified": False
                 })
             else:
+                # only show alternatives for EXCLUDE_IF_TRUE allergens, not REQUIRE_TRUE
                 relevant_alts = []
                 for a in selected_allergens:
+                    if a in REQUIRE_TRUE:
+                        continue  # ← skip vegan/vegetarian/pregnancy safe — no alternatives shown
                     alt_col = f"alt_{a.replace(' ', '_')}"
                     if alt_col in row and pd.notna(row[alt_col]) and str(row[alt_col]).strip():
                         relevant_alts.append(str(row[alt_col]).strip())
