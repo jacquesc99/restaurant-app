@@ -1,37 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <h1>Admin Dashboard</h1>
-  <p>Logged in as {{ current_user.name }}</p>
+{% extends "base.html" %}
 
-  <table border="1" cellpadding="8">
-    <thead>
-      <tr>
-        <th>Restaurant</th>
-        <th>Email</th>
-        <th>Slug</th>
-        <th>Menu URL</th>
-        <th>CSV Uploaded</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in restaurants %}
-      <tr>
-        <td>{{ r.name }}</td>
-        <td>{{ r.email }}</td>
-        <td>{{ r.slug }}</td>
-        <td><a href="/menu/{{ r.slug }}" target="_blank">/menu/{{ r.slug }}</a></td>
-        <td>{{ 'Yes' if r.csv_data else 'No' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+{% block title %}Admin Dashboard{% endblock %}
 
-  <a href="/logout">Logout</a>
-</body>
-</html>
+{% block content %}
+    <h1>Admin Dashboard</h1>
+    <p>Logged in as {{ current_user.name }}</p>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Restaurant</th>
+                <th>Email</th>
+                <th>Slug</th>
+                <th>Menu URL</th>
+                <th>CSV Uploaded</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in restaurants %}
+            <tr>
+                <td>{{ r.name }}</td>
+                <td>{{ r.email }}</td>
+                <td>{{ r.slug }}</td>
+                <td><a href="/menu/{{ r.slug }}" target="_blank">/menu/{{ r.slug }}</a></td>
+                <td>{{ 'Yes' if r.csv_data else 'No' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <a href="/logout">Logout</a>
+{% endblock %}

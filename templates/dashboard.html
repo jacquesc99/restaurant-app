@@ -1,42 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .card {
-            background: white;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 16px 0;
-            max-width: 500px;
-        }
-        .menu-link {
-            display: inline-block;
-            background: #f5f5f5;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 13px;
-            word-break: break-all;
-            margin-top: 6px;
-        }
-        .logout-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #999;
-            font-weight: normal;
-            font-size: 14px;
-        }
-        input[type="file"] {
-            background: white;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
   <h1>Welcome, {{ restaurant.name }}</h1>
 
   {% with messages = get_flashed_messages() %}
@@ -51,7 +17,6 @@
     <div class="menu-link">{{ request.url_root }}menu/{{ restaurant.slug }}</div>
   </div>
 
-  <!-- ✅ status check moved here, inside <body> -->
   {% if restaurant.csv_data %}
     <div class="card">
       <p>✅ Menu already uploaded. Upload a new file below to replace it.</p>
@@ -65,7 +30,6 @@
   <div class="card">
     <div class="group-title">Upload Menu CSV</div>
     <form method="POST" enctype="multipart/form-data">
-        <!-- removed "required" so you don't have to upload every time -->
         <input type="file" name="csv_files" accept=".csv"><br>
         <button type="submit">Upload</button>
     </form>
@@ -75,6 +39,4 @@
   <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ menu_url }}&size=200x200" />
 
   <a class="logout-link" href="/logout">Logout</a>
-
-</body>
-</html>
+{% endblock %}

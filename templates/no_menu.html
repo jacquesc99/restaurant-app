@@ -1,8 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head><title>No Menu</title></head>
-<body>
-  <h1>{{ restaurant.name }}</h1>
-  <p>This restaurant hasn't uploaded their menu yet.</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}{{ restaurant.name }} - No Menu{% endblock %}
+
+{% block content %}
+    <h1>{{ restaurant.name }}</h1>
+    <p>This restaurant hasn't uploaded their menu yet. Please check back soon.</p>
+
+    <a class="pill" href="/restaurants">← Browse Other Restaurants</a>
+{% endblock %}

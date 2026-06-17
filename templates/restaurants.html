@@ -1,79 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Restaurants</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .restaurant-card {
-            background: white;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin: 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .restaurant-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
-        .visit-btn {
-            background: #2d6cdf;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-        .visit-btn:hover {
-            background: #1f4fbf;
-            color: white;
-        }
-        .no-restaurants {
-            color: #999;
-            text-align: center;
-            margin-top: 40px;
-        }
-        @media (max-width: 480px) {
-            .restaurant-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .visit-btn {
-                width: 100%;
-                text-align: center;
-            }
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Restaurants</h1>
-<p>Browse restaurants using our allergen filter and find safe dishes for your dietary needs.</p>
+{% block title %}Restaurants{% endblock %}
 
-{% if restaurants %}
-    {% for r in restaurants %}
-        {% if r.csv_data %}
-        <div class="restaurant-card">
-            <div class="restaurant-name">{{ r.name }}</div>
-            <a class="visit-btn" href="/menu/{{ r.slug }}">View Menu →</a>
-        </div>
-        {% endif %}
-    {% endfor %}
-{% else %}
-    <p class="no-restaurants">No restaurants listed yet.</p>
-{% endif %}
+{% block content %}
+    <h1>Restaurants</h1>
+    <p>Browse restaurants using our allergen filter and find safe dishes for your dietary needs.</p>
 
-<p style="font-size:12px; color:#999; text-align:center; margin-top:40px;">
-    © 2026 All Rights Reserved | <a href="/terms">Terms of Service</a>
-</p>
-
-</body>
-</html>
+    {% if restaurants %}
+        {% for r in restaurants %}
+            {% if r.csv_data %}
+            <div class="restaurant-card">
+                <div class="restaurant-name">{{ r.name }}</div>
+                <a class="visit-btn" href="/menu/{{ r.slug }}">View Menu →</a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p class="no-restaurants">No restaurants listed yet.</p>
+    {% endif %}
+{% endblock %}
