@@ -2,71 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ambrogio PB Allergen & Dietary Filter</title>
-
+    <title>{{ restaurant.name }} Allergen & Dietary Filter</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #fafafa;
-        }
-
-        h1 {
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-
-        .group-title {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 10px 14px;
-            margin: 6px;
-            border: 1px solid #ddd;
-            border-radius: 999px;
-            cursor: pointer;
-            background-color: #f5f5f5;
-            font-size: 14px;
-            user-select: none;
-            transition: 0.2s;
-        }
-
-        .pill input {
-            display: none;
-        }
-
-        .pill:has(input:checked) {
-            background-color: #2d6cdf;
-            color: white;
-            border-color: #2d6cdf;
-        }
-
-        button {
-            margin-top: 20px;
-            padding: 12px 16px;
-            font-size: 16px;
-            border: none;
-            background: #2d6cdf;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #1f4fbf;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<h1>Select Allergens & Dietary Preferences</h1>
+<h1>{{ restaurant.name }}</h1>
+<p>Select your dietary restrictions and we'll show you what's safe to eat.</p>
 
 <form method="POST">
 
@@ -95,26 +39,19 @@
     <div class="group-title">Dietary Preferences</div>
     <label class="pill"><input type="checkbox" name="allergens" value="vegetarian">Vegetarian</label>
     <label class="pill"><input type="checkbox" name="allergens" value="vegan">Vegan</label>
-    <label class="pill"><input type="checkbox" name="allergens" value="pregnancy safe"> Pregnancy Safe</label>
+    <label class="pill"><input type="checkbox" name="allergens" value="pregnancy safe">Pregnancy Safe</label>
 
-    <div style="
-    background: #fff8e1;
-    border-left: 4px solid #f39c12;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin: 20px 0;
-    font-size: 13px;
-    color: #555;
-">
-    ⚠️ <strong>Please Note:</strong> This tool is a helpful guide only and does not represent a comprehensive list of ingredients or allergens. Menu items and preparations may vary. Always inform your server of any allergies or dietary requirements before ordering. This application is not a medical resource and should not be relied upon as such.
-</div>
+    <div class="disclaimer">
+        ⚠️ <strong>Please Note:</strong> This tool is a helpful guide only and does not represent a comprehensive list of ingredients or allergens. Menu items and preparations may vary. Always inform your server of any allergies or dietary requirements before ordering. This application is not a medical resource and should not be relied upon as such.
+    </div>
 
     <button type="submit">Find Safe Dishes</button>
 
-<p style="font-size:12px; color:#999; text-align:center; margin-top:40px;">
-  © 2026 All Rights Reserved | <a href="/terms">Terms of Service</a>
-</p>
 </form>
+
+<p style="font-size:12px; color:#999; text-align:center; margin-top:40px;">
+    © 2026 All Rights Reserved | <a href="/terms">Terms of Service</a>
+</p>
 
 </body>
 </html>

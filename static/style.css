@@ -1,7 +1,14 @@
+/* ── Base ────────────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background: #fafafa;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 h1 {
@@ -19,17 +26,21 @@ p {
     font-weight: bold;
 }
 
-input {
+/* ── Inputs ──────────────────────────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"] {
     padding: 10px;
     margin-bottom: 12px;
     width: 100%;
-    max-width: 300px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px; /* 16px prevents iOS zoom on focus */
     box-sizing: border-box;
 }
 
+/* ── Pills ───────────────────────────────────────────── */
 .pill {
     display: inline-flex;
     align-items: center;
@@ -39,7 +50,7 @@ input {
     border-radius: 999px;
     cursor: pointer;
     background-color: #f5f5f5;
-    font-size: 14px;
+    font-size: 15px;
     user-select: none;
     text-decoration: none;
     color: #333;
@@ -66,23 +77,103 @@ a.pill:hover {
     background-color: #1f4fbf;
 }
 
+/* ── Buttons ─────────────────────────────────────────── */
 button {
     margin-top: 20px;
-    padding: 12px 16px;
+    padding: 14px 20px;
     font-size: 16px;
     border: none;
     background: #2d6cdf;
     color: white;
     border-radius: 8px;
     cursor: pointer;
+    width: 100%;
+    max-width: 400px;
 }
 
 button:hover {
     background: #1f4fbf;
 }
 
+/* ── Links ───────────────────────────────────────────── */
 a {
     color: #2d6cdf;
     font-weight: bold;
     text-decoration: none;
+}
+
+/* ── Cards ───────────────────────────────────────────── */
+.card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    width: 100%;
+}
+
+/* ── Back button ─────────────────────────────────────── */
+.back {
+    display: block;
+    margin-top: 20px;
+    text-decoration: none;
+    background: #2d6cdf;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.back:hover {
+    background: #1a4fa8;
+    color: white;
+}
+
+/* ── Menu link box ───────────────────────────────────── */
+.menu-link {
+    display: block;
+    background: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    word-break: break-all;
+    margin-top: 6px;
+}
+
+/* ── Mobile ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .pill {
+        font-size: 14px;
+        padding: 9px 12px;
+        margin: 4px;
+    }
+
+    button {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .back {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        font-size: 16px;
+    }
 }
