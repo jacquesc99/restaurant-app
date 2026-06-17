@@ -154,7 +154,7 @@ def menu(slug):
 
     df = pd.read_csv(io.StringIO(restaurant.csv_data), sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
-    NON_ALLERGEN_COLUMNS = ['dish', 'category', 'alternatives']
+    NON_ALLERGEN_COLUMNS = ['dish', 'category'] + [col for col in df.columns if col.startswith('alt_')]
 
     for col in df.columns:
         if col not in NON_ALLERGEN_COLUMNS:
@@ -177,8 +177,6 @@ def menu(slug):
                            'cured meats']
         REQUIRE_TRUE = ['vegetarian', 'vegan', 'pregnancy safe']
 
-        safe_results = []
-
         for _, row in df.iterrows():
             is_safe = True
             for a in selected_allergens:
@@ -194,13 +192,19 @@ def menu(slug):
                     "dish": row['dish'],
                     "modified": False
                 })
-            elif pd.notna(row.get('alternatives')) and str(row.get('alternatives')).strip():
-                all_alts = [a.strip() for a in str(row['alternatives']).split('|')]
-                safe_results.append({
-                    "dish": row['dish'],
-                    "modified": True,
-                    "modifications": all_alts
-                })
+            else:
+                relevant_alts = []
+                for a in selected_allergens:
+                    alt_col = f"alt_{a.replace(' ', '_')}"
+                    if alt_col in row and pd.notna(row[alt_col]) and str(row[alt_col]).strip():
+                        relevant_alts.append(str(row[alt_col]).strip())
+
+                if relevant_alts:
+                    safe_results.append({
+                        "dish": row['dish'],
+                        "modified": True,
+                        "modifications": relevant_alts
+                    })
 
         return render_template('results.html', results=safe_results, restaurant=restaurant)
 
