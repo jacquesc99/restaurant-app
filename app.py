@@ -41,9 +41,14 @@ with app.app_context():
 def home():
     return render_template('home.html')
 
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
+        if not request.form.get('agree_terms'):
+            flash('You must agree to the Terms of Service to sign up.')
+            return redirect(url_for('signup'))
+
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -71,6 +76,7 @@ def signup():
         return redirect(url_for('dashboard'))
 
     return render_template('signup.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
