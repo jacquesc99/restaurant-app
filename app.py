@@ -145,6 +145,10 @@ def dashboard():
     menu_url = url_for('menu', slug=current_user.slug, _external=True)
     return render_template('dashboard.html', restaurant=current_user, menu_url=menu_url)
 
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
 @app.route('/menu/<slug>', methods=['GET', 'POST'])
 def menu(slug):
     restaurant = Restaurant.query.filter_by(slug=slug).first_or_404()
