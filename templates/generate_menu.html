@@ -4,6 +4,21 @@
 
 {% block content %}
     <h1>AI Menu Generator</h1>
+<div class="disclaimer">
+    <strong>📋 Rules for best results:</strong>
+    <ul>
+        <li>Enter one dish per line in the format: <strong>Dish Name: ingredient 1, ingredient 2, ingredient 3</strong></li>
+        <li>Include as many ingredients as possible — the more detail, the more accurate the allergen detection</li>
+        <li>If you only enter a dish name with no ingredients, the AI will make its best guess — always review before uploading</li>
+        <li>The downloaded CSV column headers must not be renamed or reordered — upload as-is</li>
+        <li>Do not add or remove columns from the downloaded CSV</li>
+        <li>TRUE means the allergen is present in the dish</li>
+        <li>FALSE means the allergen is not present</li>
+        <li>Alternatives are only shown to guests when a dish fails their filter — leave blank if no modification is possible</li>
+        <li>After downloading, open the CSV in Excel or Google Sheets to review before uploading</li>
+        <li>Once satisfied upload the CSV through your dashboard — it will replace your existing menu immediately</li>
+    </ul>
+</div>
     <p>Paste your menu below — one dish per line with its ingredients. The AI will generate a ready-to-upload CSV automatically.</p>
 
     <p><strong>Example format:</strong></p>
