@@ -6,6 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+from flask_mail import Mail, Message
+mail = Mail(app)
+
 
 app = Flask(__name__)
 from config import Config
@@ -64,6 +67,8 @@ def signup():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+        signature = request.form.get('signature')
+        agreed_at = datetime.utcnow().strftime('%B %d, %Y at %H:%M UTC')
 
         base_slug = name.lower().replace(' ', '-')
         slug = base_slug
@@ -84,6 +89,28 @@ def signup():
         )
         db.session.add(restaurant)
         db.session.commit()
+
+        # send email to you
+        try:
+            msg = Message(
+                subject=f'New Restaurant Signup — {name}',
+                recipients=['jacques@ambrogio15.com'],
+                body=f"""
+New restaurant signed up:
+
+Restaurant Name: {name}
+Email: {email}
+Signed: {signature}
+Date: {agreed_at}
+Menu URL: /menu/{slug}
+
+They have agreed to the Terms of Service.
+                """
+            )
+            mail.send(msg)
+        except:
+            pass  # don't block signup if email fails
+
         login_user(restaurant)
         return redirect(url_for('dashboard'))
 
