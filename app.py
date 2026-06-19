@@ -221,7 +221,7 @@ def menu(slug):
     db.session.add(visit)
     db.session.commit()
 
-    df = pd.read_csv(io.StringIO(restaurant.csv_data), sep=None, engine='python')
+    df = pd.read_csv(io.StringIO(restaurant.csv_data.lstrip('\ufeff')), sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
     NON_ALLERGEN_COLUMNS = ['dish', 'category'] + [col for col in df.columns if col.startswith('alt_')]
 
