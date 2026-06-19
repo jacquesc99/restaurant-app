@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 from config import Config
@@ -24,10 +25,11 @@ class Restaurant(UserMixin, db.Model):
     csv_data = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
 
-@app.route('/restaurants')
-def restaurants():
-    all_restaurants = Restaurant.query.filter_by(is_admin=False).all()
-    return render_template('restaurants.html', restaurants=all_restaurants)
+class MenuVisit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
+    visited_at = db.Column(db.DateTime, default=datetime.utcnow)
+    allergens_selected = db.Column(db.String(500), nullable=True)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -40,12 +42,17 @@ with app.app_context():
         db.session.commit()
     except:
         db.session.rollback()
+
 # ── Routes ───────────────────────────────────────────────
 
 @app.route('/')
 def home():
     return render_template('home.html')
 
+@app.route('/restaurants')
+def restaurants():
+    all_restaurants = Restaurant.query.filter_by(is_admin=False).all()
+    return render_template('restaurants.html', restaurants=all_restaurants)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -95,7 +102,7 @@ def login():
 
         login_user(restaurant, remember=True)
 
-        if restaurant.is_admin:                            # ← step 5
+        if restaurant.is_admin:
             return redirect(url_for('admin_dashboard'))
         return redirect(url_for('dashboard'))
 
@@ -133,8 +140,22 @@ def admin_dashboard():
         return redirect(url_for('dashboard'))
 
     restaurants = Restaurant.query.filter_by(is_admin=False).all()
-    return render_template('admin.html', restaurants=restaurants)
 
+    now = datetime.utcnow()
+    week_ago = now - timedelta(days=7)
+    month_ago = now - timedelta(days=30)
+    year_ago = now - timedelta(days=365)
+
+    stats = {}
+    for r in restaurants:
+        visits = MenuVisit.query.filter_by(restaurant_id=r.id)
+        stats[r.id] = {
+            'weekly': visits.filter(MenuVisit.visited_at >= week_ago).count(),
+            'monthly': visits.filter(MenuVisit.visited_at >= month_ago).count(),
+            'yearly': visits.filter(MenuVisit.visited_at >= year_ago).count(),
+        }
+
+    return render_template('admin.html', restaurants=restaurants, stats=stats)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -152,8 +173,33 @@ def dashboard():
         else:
             flash('Please upload a valid CSV file.')
 
+    now = datetime.utcnow()
+    week_ago = now - timedelta(days=7)
+    month_ago = now - timedelta(days=30)
+    year_ago = now - timedelta(days=365)
+
+    visits = MenuVisit.query.filter_by(restaurant_id=current_user.id)
+    weekly = visits.filter(MenuVisit.visited_at >= week_ago).count()
+    monthly = visits.filter(MenuVisit.visited_at >= month_ago).count()
+    yearly = visits.filter(MenuVisit.visited_at >= year_ago).count()
+
+    all_visits = visits.filter(MenuVisit.allergens_selected != None).all()
+    allergen_counts = {}
+    for v in all_visits:
+        for a in v.allergens_selected.split(','):
+            a = a.strip()
+            if a:
+                allergen_counts[a] = allergen_counts.get(a, 0) + 1
+    top_allergens = sorted(allergen_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+
     menu_url = url_for('menu', slug=current_user.slug, _external=True)
-    return render_template('dashboard.html', restaurant=current_user, menu_url=menu_url)
+    return render_template('dashboard.html',
+                           restaurant=current_user,
+                           menu_url=menu_url,
+                           weekly=weekly,
+                           monthly=monthly,
+                           yearly=yearly,
+                           top_allergens=top_allergens)
 
 @app.route('/generate-menu', methods=['GET', 'POST'])
 @login_required
@@ -170,6 +216,10 @@ def menu(slug):
 
     if not restaurant.csv_data:
         return render_template('no_menu.html', restaurant=restaurant)
+
+    visit = MenuVisit(restaurant_id=restaurant.id)
+    db.session.add(visit)
+    db.session.commit()
 
     df = pd.read_csv(io.StringIO(restaurant.csv_data), sep=None, engine='python')
     df.columns = df.columns.str.strip().str.lower()
@@ -190,10 +240,13 @@ def menu(slug):
     if request.method == 'POST':
         selected_allergens = [a.lower() for a in request.form.getlist('allergens')]
 
+        visit.allergens_selected = ','.join(selected_allergens)
+        db.session.commit()
+
         EXCLUDE_IF_TRUE = ['pork', 'beef', 'chicken', 'egg', 'dairy', 'fish', 'shellfish',
-                           'gluten', 'peanuts', 'tree nuts', 'soy', 'sesame', 'seed', 'capsaicin',
+                           'gluten', 'peanuts', 'tree nuts', 'soy', 'sesame', 'capsaicin',
                            'piperine', 'unpasteurized (raw) cheese', 'derived protiens',
-                           'cured meats']
+                           'cured meats', 'seed']
 
         REQUIRE_TRUE = ['vegetarian', 'vegan', 'pregnancy safe']
 
@@ -213,11 +266,8 @@ def menu(slug):
                     "modified": False
                 })
             else:
-                # only show alternatives for EXCLUDE_IF_TRUE allergens, not REQUIRE_TRUE
                 relevant_alts = []
                 for a in selected_allergens:
-                    if a in REQUIRE_TRUE:
-                        continue  # ← skip vegan/vegetarian/pregnancy safe — no alternatives shown
                     alt_col = f"alt_{a.replace(' ', '_')}"
                     if alt_col in row and pd.notna(row[alt_col]) and str(row[alt_col]).strip():
                         relevant_alts.append(str(row[alt_col]).strip())

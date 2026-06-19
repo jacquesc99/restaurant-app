@@ -17,6 +17,35 @@
     <div class="menu-link">{{ request.url_root }}menu/{{ restaurant.slug }}</div>
   </div>
 
+  <div class="card">
+    <div class="group-title">📊 Menu Analytics</div>
+    <table style="width:100%; margin-top:10px; border-collapse: collapse;">
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 10px 0; color:#555;">This week</td>
+        <td style="padding: 10px 0;"><strong>{{ weekly }} visits</strong></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 10px 0; color:#555;">This month</td>
+        <td style="padding: 10px 0;"><strong>{{ monthly }} visits</strong></td>
+      </tr>
+      <tr>
+        <td style="padding: 10px 0; color:#555;">This year</td>
+        <td style="padding: 10px 0;"><strong>{{ yearly }} visits</strong></td>
+      </tr>
+    </table>
+
+    {% if top_allergens %}
+    <div class="group-title" style="margin-top:15px;">Top Selected Allergens</div>
+    <ul style="margin-top:8px; padding-left:20px;">
+      {% for allergen, count in top_allergens %}
+        <li style="padding: 4px 0; color:#555;">{{ allergen | title }} — <strong>{{ count }}</strong> times</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p style="margin-top:10px;">No allergen data yet — data will appear once guests use your menu.</p>
+    {% endif %}
+  </div>
+
   {% if restaurant.csv_data %}
     <div class="card">
       <p>✅ Menu already uploaded. Upload a new file below to replace it.</p>

@@ -1,3 +1,17 @@
+/* ── Colors ──────────────────────────────────────────── */
+:root {
+    --blue-primary: #1a73e8;
+    --blue-dark: #0d47a1;
+    --blue-light: #e8f0fe;
+    --bg: #f8fafd;
+    --card-bg: #ffffff;
+    --border: #e3eaf5;
+    --text-primary: #1a2340;
+    --text-secondary: #5f7494;
+    --green: #00897b;
+    --orange: #f59e0b;
+}
+
 /* ── Base ────────────────────────────────────────────── */
 * {
     box-sizing: border-box;
@@ -6,24 +20,27 @@
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background: #fafafa;
+    background: var(--bg);
     max-width: 600px;
     margin: 0 auto;
+    color: var(--text-primary);
 }
 
 h1 {
     font-size: 22px;
     margin-bottom: 15px;
+    color: var(--blue-dark);
 }
 
 p {
-    color: #555;
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
 .group-title {
     margin-top: 20px;
     font-weight: bold;
+    color: var(--text-primary);
 }
 
 /* ── Inputs ──────────────────────────────────────────── */
@@ -34,10 +51,18 @@ input[type="file"] {
     padding: 10px;
     margin-bottom: 12px;
     width: 100%;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 16px; /* 16px prevents iOS zoom on focus */
+    font-size: 16px;
     box-sizing: border-box;
+    color: var(--text-primary);
+    background: var(--card-bg);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--blue-primary);
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
 }
 
 /* ── Pills ───────────────────────────────────────────── */
@@ -46,14 +71,14 @@ input[type="file"] {
     align-items: center;
     padding: 10px 14px;
     margin: 6px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 999px;
     cursor: pointer;
-    background-color: #f5f5f5;
+    background-color: var(--card-bg);
     font-size: 15px;
     user-select: none;
     text-decoration: none;
-    color: #333;
+    color: var(--text-primary);
     transition: 0.2s;
 }
 
@@ -62,19 +87,19 @@ input[type="file"] {
 }
 
 .pill:has(input:checked) {
-    background-color: #2d6cdf;
+    background-color: var(--blue-primary);
     color: white;
-    border-color: #2d6cdf;
+    border-color: var(--blue-primary);
 }
 
 a.pill {
-    background-color: #2d6cdf;
+    background-color: var(--blue-primary);
     color: white;
     font-weight: bold;
 }
 
 a.pill:hover {
-    background-color: #1f4fbf;
+    background-color: var(--blue-dark);
 }
 
 /* ── Buttons ─────────────────────────────────────────── */
@@ -83,33 +108,36 @@ button {
     padding: 14px 20px;
     font-size: 16px;
     border: none;
-    background: #2d6cdf;
+    background: var(--blue-primary);
     color: white;
     border-radius: 8px;
     cursor: pointer;
     width: 100%;
     max-width: 400px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
 }
 
 button:hover {
-    background: #1f4fbf;
+    background: var(--blue-dark);
 }
 
 /* ── Links ───────────────────────────────────────────── */
 a {
-    color: #2d6cdf;
+    color: var(--blue-primary);
     font-weight: bold;
     text-decoration: none;
 }
 
 /* ── Cards ───────────────────────────────────────────── */
 .card {
-    background: white;
-    border: 1px solid #eee;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
     margin: 16px 0;
     width: 100%;
+    box-shadow: 0 1px 4px rgba(26, 115, 232, 0.06);
 }
 
 /* ── Back button ─────────────────────────────────────── */
@@ -117,7 +145,7 @@ a {
     display: block;
     margin-top: 20px;
     text-decoration: none;
-    background: #2d6cdf;
+    background: var(--blue-primary);
     color: white;
     padding: 14px 24px;
     border-radius: 8px;
@@ -129,84 +157,57 @@ a {
 }
 
 .back:hover {
-    background: #1a4fa8;
+    background: var(--blue-dark);
     color: white;
 }
 
 /* ── Menu link box ───────────────────────────────────── */
 .menu-link {
     display: block;
-    background: #f5f5f5;
+    background: var(--blue-light);
     padding: 8px 12px;
     border-radius: 8px;
     font-family: monospace;
     font-size: 13px;
     word-break: break-all;
     margin-top: 6px;
+    color: var(--blue-dark);
 }
+
+/* ── Logout link ─────────────────────────────────────── */
 .logout-link {
     display: inline-block;
     margin-top: 20px;
-    color: #999;
+    color: var(--text-secondary);
     font-weight: normal;
     font-size: 14px;
 }
 
 input[type="file"] {
-    background: white;
-}
-/* ── Mobile ──────────────────────────────────────────── */
-@media (max-width: 480px) {
-    body {
-        padding: 16px;
-    }
-
-    h1 {
-        font-size: 20px;
-    }
-
-    .pill {
-        font-size: 14px;
-        padding: 9px 12px;
-        margin: 4px;
-    }
-
-    button {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .back {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-        font-size: 16px;
-    }
+    background: var(--card-bg);
 }
 
+/* ── Restaurant cards ────────────────────────────────── */
 .restaurant-card {
-    background: white;
-    border: 1px solid #eee;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px 20px;
     margin: 12px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 1px 4px rgba(26, 115, 232, 0.06);
 }
 
 .restaurant-name {
     font-size: 18px;
     font-weight: bold;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .visit-btn {
-    background: #2d6cdf;
+    background: var(--blue-primary);
     color: white;
     padding: 10px 18px;
     border-radius: 8px;
@@ -217,54 +218,46 @@ input[type="file"] {
 }
 
 .visit-btn:hover {
-    background: #1f4fbf;
+    background: var(--blue-dark);
     color: white;
 }
 
 .no-restaurants {
-    color: #999;
+    color: var(--text-secondary);
     text-align: center;
     margin-top: 40px;
 }
 
-@media (max-width: 480px) {
-    .restaurant-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    .visit-btn {
-        width: 100%;
-        text-align: center;
-    }
-}
-
+/* ── Results ─────────────────────────────────────────── */
 .safe {
-    border-left: 6px solid #2ecc71;
+    border-left: 6px solid var(--green);
 }
 
 .modified {
-    border-left: 6px solid #f39c12;
+    border-left: 6px solid var(--orange);
 }
 
 .dish-name {
     font-size: 18px;
     font-weight: bold;
+    color: var(--text-primary);
 }
 
 .status {
     margin-top: 5px;
     font-size: 14px;
+    color: var(--text-secondary);
 }
-/* ── Disclaimer ──────────────────────────────────────────── */
+
+/* ── Disclaimer ──────────────────────────────────────── */
 .disclaimer {
-    background: #fff8e1;
-    border-left: 4px solid #f39c12;
+    background: #fffbeb;
+    border-left: 4px solid var(--orange);
     border-radius: 8px;
     padding: 12px 16px;
     margin: 20px 0;
     font-size: 13px;
-    color: #555;
+    color: var(--text-secondary);
 }
 
 .disclaimer ul {
@@ -275,5 +268,7 @@ input[type="file"] {
 .disclaimer li {
     margin-bottom: 6px;
     font-size: 13px;
-    color: #555;
+    color: var(--text-secondary);
 }
+
+/* ── Mobile

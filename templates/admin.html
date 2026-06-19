@@ -6,29 +6,45 @@
     <h1>Admin Dashboard</h1>
     <p>Logged in as {{ current_user.name }}</p>
 
-    <table border="1" cellpadding="8">
-        <thead>
-            <tr>
-                <th>Restaurant</th>
-                <th>Email</th>
-                <th>Slug</th>
-                <th>Menu URL</th>
-                <th>CSV Uploaded</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in restaurants %}
-            <tr>
-                <td>{{ r.name }}</td>
-                <td>{{ r.email }}</td>
-                <td>{{ r.slug }}</td>
-                <td><a href="/menu/{{ r.slug }}" target="_blank">/menu/{{ r.slug }}</a></td>
-                <td>{{ 'Yes' if r.csv_data else 'No' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card">
+        <div class="group-title">📊 Platform Overview</div>
+        <table style="width:100%; margin-top:10px; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#f5f5f5;">
+                    <th style="padding:10px; text-align:left; border-bottom:1px solid #ddd;">Restaurant</th>
+                    <th style="padding:10px; text-align:left; border-bottom:1px solid #ddd;">Email</th>
+                    <th style="padding:10px; text-align:left; border-bottom:1px solid #ddd;">Menu URL</th>
+                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">CSV</th>
+                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">Week</th>
+                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">Month</th>
+                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in restaurants %}
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:10px;">{{ r.name }}</td>
+                    <td style="padding:10px; font-size:13px;">{{ r.email }}</td>
+                    <td style="padding:10px;">
+                        <a href="/menu/{{ r.slug }}" target="_blank">/menu/{{ r.slug }}</a>
+                    </td>
+                    <td style="padding:10px; text-align:center;">
+                        {{ '✅' if r.csv_data else '❌' }}
+                    </td>
+                    <td style="padding:10px; text-align:center;">
+                        <strong>{{ stats[r.id].weekly }}</strong>
+                    </td>
+                    <td style="padding:10px; text-align:center;">
+                        <strong>{{ stats[r.id].monthly }}</strong>
+                    </td>
+                    <td style="padding:10px; text-align:center;">
+                        <strong>{{ stats[r.id].yearly }}</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <br>
     <a href="/logout">Logout</a>
 {% endblock %}
