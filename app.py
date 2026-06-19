@@ -82,11 +82,6 @@ def signup():
 
     return render_template('signup.html')
 
-@app.route('/generate-menu', methods=['GET', 'POST'])
-@login_required
-def generate_menu():
-    return render_template('generate_menu.html')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
