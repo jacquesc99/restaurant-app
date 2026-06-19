@@ -191,7 +191,7 @@ def menu(slug):
         selected_allergens = [a.lower() for a in request.form.getlist('allergens')]
 
         EXCLUDE_IF_TRUE = ['pork', 'beef', 'chicken', 'egg', 'dairy', 'fish', 'shellfish',
-                           'gluten', 'peanuts', 'tree nuts', 'soy', 'sesame', 'capsaicin',
+                           'gluten', 'peanuts', 'tree nuts', 'soy', 'sesame', 'seed', 'capsaicin',
                            'piperine', 'unpasteurized (raw) cheese', 'derived protiens',
                            'cured meats']
 
