@@ -82,6 +82,10 @@ def signup():
 
     return render_template('signup.html')
 
+@app.route('/generate-menu', methods=['GET', 'POST'])
+@login_required
+def generate_menu():
+    return render_template('generate_menu.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -155,6 +159,11 @@ def dashboard():
 
     menu_url = url_for('menu', slug=current_user.slug, _external=True)
     return render_template('dashboard.html', restaurant=current_user, menu_url=menu_url)
+
+@app.route('/generate-menu', methods=['GET', 'POST'])
+@login_required
+def generate_menu():
+    return render_template('generate_menu.html')
 
 @app.route('/terms')
 def terms():

@@ -28,6 +28,12 @@
   {% endif %}
 
   <div class="card">
+    <div class="group-title">Generate Menu with AI</div>
+    <p>Describe your dishes and let AI fill in allergens and alternatives automatically.</p>
+    <a class="pill" href="/generate-menu">Generate Menu CSV →</a>
+  </div>
+
+  <div class="card">
     <div class="group-title">Upload Menu CSV</div>
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="csv_files" accept=".csv"><br>
@@ -39,4 +45,5 @@
   <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ menu_url }}&size=200x200" />
 
   <a class="logout-link" href="/logout">Logout</a>
+
 {% endblock %}

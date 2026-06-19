@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Menu CSV{% endblock %}
+
+{% block content %}
+    <h1>AI Menu Generator</h1>
+    <p>Describe your dishes and we'll generate a ready-to-upload CSV automatically.</p>
+
+    <div id="dish-inputs">
+        <div class="dish-row">
+            <input type="text" class="dish-name" placeholder="Dish name (e.g. Sausage & Porcini Pizza)">
+            <input type="text" class="dish-desc" placeholder="Describe ingredients (e.g. pork sausage, porcini mushrooms, mozzarella, tomato, gluten crust)">
+        </div>
+    </div>
+
+    <button onclick="addDish()">+ Add Another Dish</button>
+    <button onclick="generateCSV()">Generate CSV with AI</button>
+
+    <div id="loading" style="display:none;">
+        <p>⏳ Generating your menu CSV...</p>
+    </div>
+
+    <div id="result" style="display:none;">
+        <h2>Your Generated CSV</h2>
+        <textarea id="csv-output" rows="15" style="width:100%; font-family:monospace; font-size:13px;"></textarea>
+        <br>
+        <button onclick="downloadCSV()">Download CSV</button>
+        <a href="/dashboard" class="pill" style="margin-left:10px;">← Back to Dashboard</a>
+    </div>
+
+    <script>
+    function addDish() {
+        const container = document.getElementById('dish-inputs');
+        const row = document.createElement('div');
+        row.className = 'dish-row';
+        row.style.marginTop = '10px';
+        row.innerHTML = `
+            <input type="text" class="dish-name" placeholder="Dish name">
+            <input type="text" class="dish-desc" placeholder="Describe ingredients">
+        `;
+        container.appendChild(row);
+    }
+
+    async function generateCSV() {
+        const names = document.querySelectorAll('.dish-name');
+        const descs = document.querySelectorAll('.dish-desc');
+
+        let dishes = [];
+        for (let i = 0; i < names.length; i++) {
+            if (names[i].value.trim()) {
+                dishes.push(`${names[i].value}: ${descs[i].value}`);
+            }
+        }
+
+        if (dishes.length === 0) {
+            alert('Please enter at least one dish.');
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+
+        const prompt = `You are a restaurant allergen expert. Generate a CSV for the following dishes.
+
+The CSV must have these exact columns:
+dish,category,pork,beef,chicken,egg,dairy,fish,shellfish,gluten,peanuts,tree nuts,soy,sesame,capsaicin,piperine,vegetarian,vegan,pregnancy safe,alt_pork,alt_beef,alt_chicken,alt_egg,alt_dairy,alt_fish,alt_shellfish,alt_gluten,alt_peanuts,alt_tree_nuts,alt_soy,alt_sesame,alt_capsaicin,alt_piperine
+
+Rules:
+- Use TRUE or FALSE for allergen columns
+- Only fill alt_ columns if the dish CAN be modified to remove that allergen
+- Leave alt_ cells empty if no modification is possible
+- Be accurate based on typical restaurant ingredients
+- Return ONLY the CSV, no explanation, no markdown
+
+Dishes:
+${dishes.join('\n')}`;
+
+        try {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-6',
+                    max_tokens: 1000,
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+
+            const data = await response.json();
+            const csv = data.content[0].text.trim();
+
+            document.getElementById('csv-output').value = csv;
+            document.getElementById('result').style.display = 'block';
+        } catch (err) {
+            alert('Error generating CSV. Please try again.');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+
+    function downloadCSV() {
+        const csv = document.getElementById('csv-output').value;
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'menu.csv';
+        a.click();
+    }
+    </script>
+{% endblock %}
