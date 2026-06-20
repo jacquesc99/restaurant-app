@@ -92,7 +92,21 @@
     <br><br>
     <a class="pill" href="/qr/{{ restaurant.slug }}" download="qr_code.png">Download QR Code</a>
   </div>
+<div class="card">
+    <div class="group-title">Your QR Code</div>
+    <p>Your menu link: <strong>{{ menu_url }}</strong></p>
+    <img src="/qr/{{ restaurant.slug }}" style="width:200px; height:200px; border-radius:8px;">
+    <br><br>
 
+    <div class="group-title" style="margin-top:15px;">QR Code Color</div>
+    <form method="POST" action="/update-qr-color" style="margin-top:10px;">
+        <input type="color" name="qr_color" value="{{ restaurant.qr_color or '#0d47a1' }}"
+               style="width:60px; height:40px; border:none; cursor:pointer; border-radius:8px;">
+        <button type="submit" style="width:auto; padding:10px 20px; margin-left:10px;">Save Color</button>
+    </form>
+    <br>
+    <a class="pill" href="/qr/{{ restaurant.slug }}" download="qr_code.png">Download QR Code</a>
+  </div>
   <a class="logout-link" href="/logout">Logout</a>
 
 {% endblock %}

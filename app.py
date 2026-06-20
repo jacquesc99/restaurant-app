@@ -30,6 +30,7 @@ class Restaurant(UserMixin, db.Model):
     csv_data = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
     logo_data = db.Column(db.Text, nullable=True)
+    qr_color = db.Column(db.String(20), nullable=True, default='#0d47a1')
 
 class MenuVisit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,6 +51,11 @@ with app.app_context():
         db.session.rollback()
     try:
         db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN logo_data TEXT'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+    try:
+        db.session.execute(db.text("ALTER TABLE restaurant ADD COLUMN qr_color VARCHAR(20) DEFAULT '#0d47a1'"))
         db.session.commit()
     except:
         db.session.rollback()
@@ -276,10 +282,21 @@ def upload_logo():
         flash('Please upload a valid image file.')
     return redirect(url_for('dashboard'))
 
+@app.route('/update-qr-color', methods=['POST'])
+@login_required
+def update_qr_color():
+    color = request.form.get('qr_color', '#0d47a1')
+    current_user.qr_color = color
+    db.session.commit()
+    flash('QR code color updated!')
+    return redirect(url_for('dashboard'))
+
 @app.route('/qr/<slug>')
 def generate_qr(slug):
     restaurant = Restaurant.query.filter_by(slug=slug).first_or_404()
     menu_url = url_for('menu', slug=slug, _external=True)
+
+    qr_color = restaurant.qr_color or '#0d47a1'
 
     qr = qrcode.QRCode(
         version=1,
@@ -289,7 +306,7 @@ def generate_qr(slug):
     )
     qr.add_data(menu_url)
     qr.make(fit=True)
-    qr_img = qr.make_image(fill_color='#0d47a1', back_color='white').convert('RGB')
+    qr_img = qr.make_image(fill_color=qr_color, back_color='white').convert('RGB')
 
     if restaurant.logo_data:
         try:
