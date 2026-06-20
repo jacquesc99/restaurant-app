@@ -1,11 +1,11 @@
 {
-    "name": "Restaurant Allergen Filter",
-    "short_name": "AllergenApp",
-    "description": "Find safe dishes based on your dietary restrictions",
+    "name": "Eat with Ease",
+    "short_name": "EatWithEase",
+    "description": "A helpful dietary tool to place your order with confidence",
     "start_url": "/restaurants",
     "display": "standalone",
-    "background_color": "#fafafa",
-    "theme_color": "#2d6cdf",
+    "background_color": "#f8fafd",
+    "theme_color": "#1a73e8",
     "icons": [
         {
             "src": "/static/icon-192.png",
