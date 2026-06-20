@@ -12,6 +12,11 @@
     --orange: #f59e0b;
 }
 
+/* ── Menu Page ────────────────────────────────────────────── */
+.menu-page {
+    background: #f0ede8;  /* ← warm deep off-white */
+}
+
 /* ── Base ────────────────────────────────────────────── */
 * {
     box-sizing: border-box;
@@ -24,6 +29,10 @@ body {
     max-width: 600px;
     margin: 0 auto;
     color: var(--text-primary);
+}
+
+body.menu-page {
+    background: #f0ede8;
 }
 
 h1 {
@@ -71,7 +80,7 @@ input:focus {
     align-items: center;
     padding: 10px 14px;
     margin: 6px;
-    border: 1px solid var(--border);
+    border: 1.5px solid #c8a96e;  /* ← bronze border */
     border-radius: 999px;
     cursor: pointer;
     background-color: var(--card-bg);
@@ -271,4 +280,47 @@ input[type="file"] {
     color: var(--text-secondary);
 }
 
-/* ── Mobile
+
+/* ── Mobile ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .pill {
+        font-size: 14px;
+        padding: 9px 12px;
+        margin: 4px;
+    }
+
+    button {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .back {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .restaurant-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .visit-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        font-size: 16px;
+    }
+}
