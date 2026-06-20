@@ -7,7 +7,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from flask_mail import Mail, Message
-mail = Mail(app)
+
 
 
 app = Flask(__name__)
@@ -17,6 +17,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+mail = Mail(app)
 
 # ── Models ──────────────────────────────────────────────
 class Restaurant(UserMixin, db.Model):
