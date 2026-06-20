@@ -92,30 +92,54 @@ def signup():
         db.session.commit()
 
         # send email to you
+        # send email to you
         try:
-            msg = Message(
-                subject=f'New Restaurant Signup — {name}',
-                recipients=['jacques@ambrogio15.com'],
-                body=f"""
-New restaurant signed up:
+            resend.api_key = os.environ.get('RESEND_API_KEY')
 
-Restaurant Name: {name}
-Email: {email}
-Signed: {signature}
-Date: {agreed_at}
-Menu URL: /menu/{slug}
+            # email to you
+            resend.Emails.send({
+                "from": "onboarding@resend.dev",
+                "to": "jacques.calame89@gmail.com",
+                "subject": f"New Restaurant Signup — {name}",
+                "text": f"""
+        New restaurant signed up and agreed to Terms of Service:
 
-They have agreed to the Terms of Service.
+        Restaurant Name: {name}
+        Email: {email}
+        Signed by: {signature}
+        Date: {agreed_at}
+        Menu URL: allergens-at-restaurants.onrender.com/menu/{slug}
                 """
-            )
-            mail.send(msg)
+            })
+
+            # email to the restaurant
+            resend.Emails.send({
+                "from": "onboarding@resend.dev",
+                "to": email,
+                "subject": "Welcome to the Allergen Filter App — Terms of Service Confirmation",
+                "text": f"""
+        Hi {name},
+
+        Thank you for signing up for the Allergen & Dietary Filter App.
+
+        This email confirms that you have read and agreed to our Terms of Service on {agreed_at}.
+
+        Signed by: {signature}
+
+        Your menu page is live at:
+        allergens-at-restaurants.onrender.com/menu/{slug}
+
+        Log in to your dashboard to upload your menu CSV and generate your QR code:
+        allergens-at-restaurants.onrender.com/login
+
+        Important reminder: You are solely responsible for the accuracy of the allergen data you upload. Please keep your menu information up to date.
+
+        © 2026 All Rights Reserved
+                """
+            })
+
         except:
-            pass  # don't block signup if email fails
-
-        login_user(restaurant)
-        return redirect(url_for('dashboard'))
-
-    return render_template('signup.html')
+            pass
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
