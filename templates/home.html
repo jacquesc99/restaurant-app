@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Restaurant Allergen Filter{% endblock %}
+{% block title %}Eat with Ease{% endblock %}
 
 {% block content %}
-    <h1>Restaurant Allergen Filter</h1>
-    <p>Manage your menu's allergen and dietary information.</p>
+    <h1>Eat with Ease</h1>
+    <p>A helpful dietary tool to help you place your order with confidence.</p>
 
-    <a class="pill" href="/signup">Sign Up</a>
-    <a class="pill" href="/login">Login</a>
-    <a class="pill" href="/restaurants">Browse Restaurants</a>
+    <div class="card">
+        <div class="group-title">For Guests</div>
+        <p>Browse restaurants and filter dishes based on your dietary restrictions and allergens.</p>
+        <a class="pill" href="/restaurants">Browse Restaurants</a>
+    </div>
+
+    <div class="card">
+        <div class="group-title">For Restaurants</div>
+        <p>Upload your menu and give your guests a safer, more confident dining experience.</p>
+        <a class="pill" href="/signup">Sign Up</a>
+        <a class="pill" href="/login">Login</a>
+    </div>
 {% endblock %}

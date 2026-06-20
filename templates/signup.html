@@ -3,7 +3,7 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-  <h1>Restaurant Sign Up</h1>
+  <h1>Sign Up</h1>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -11,21 +11,30 @@
     {% endif %}
   {% endwith %}
 
-<form method="POST">
-    <input type="text" name="name" placeholder="Restaurant Name" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
+  <div class="card">
+    <div class="group-title">Your Details</div>
+    <form method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
 
-    <label>
-      <input type="checkbox" name="agree_terms" required>
-      I agree to the <a href="/terms" target="_blank">Terms of Service</a>
-    </label><br><br>
+        <div class="group-title" style="margin-top:16px;">Terms of Service</div>
+        <div class="disclaimer">
+            Please read our <a href="/terms" target="_blank">Terms of Service</a> before signing up. By signing up you agree to be bound by these terms.
+        </div>
 
-    <p style="font-size:13px; color:#5f7494;">By signing below you confirm you have read and agree to the Terms of Service.</p>
-    <input type="text" name="signature" placeholder="Full Name (as signature)" required><br>
+        <label style="display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text-secondary); margin-top:10px;">
+            <input type="checkbox" name="agree_terms" required style="width:auto; margin:0;">
+            I agree to the <a href="/terms" target="_blank">Terms of Service</a>
+        </label>
 
-    <button type="submit">Sign Up</button>
-</form>
+        <div class="group-title" style="margin-top:16px;">Signature</div>
+        <p>By signing below you confirm you have read and agree to the Terms of Service.</p>
+        <input type="text" name="signature" placeholder="Full Name (as signature)" required>
+
+        <button type="submit">Sign Up</button>
+    </form>
+  </div>
 
   <p>Already have an account? <a href="/login">Log in</a></p>
 {% endblock %}

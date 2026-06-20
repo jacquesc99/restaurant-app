@@ -3,7 +3,7 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-  <h1>Restaurant Login</h1>
+  <h1>Login</h1>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -11,23 +11,18 @@
     {% endif %}
   {% endwith %}
 
-  <form method="POST">
-    <input type="email" name="email" placeholder="Email" required><br><br>
+  <div class="card">
+    <form method="POST">
+        <input type="email" name="email" placeholder="Email" required>
 
-    <div style="position: relative; display: inline-block; width: 100%; max-width: 400px;">
-        <input type="password" name="password" id="password" placeholder="Password" required>
-        <span onclick="togglePassword()" style="
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 18px;
-        ">👁</span>
-    </div><br><br>
+        <div style="position:relative; width:100%;">
+            <input type="password" name="password" id="password" placeholder="Password" required style="padding-right:40px;">
+            <span onclick="togglePassword()" style="position:absolute; right:12px; top:50%; transform:translateY(-60%); cursor:pointer; font-size:18px;">👁</span>
+        </div>
 
-    <button type="submit">Login</button>
-  </form>
+        <button type="submit">Login</button>
+    </form>
+  </div>
 
   <p>Don't have an account? <a href="/signup">Sign up</a></p>
   <p><a href="/reset-password">Forgot password?</a></p>
