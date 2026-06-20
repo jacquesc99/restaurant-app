@@ -9,42 +9,70 @@
     <div class="card">
         <div class="group-title">📊 Platform Overview</div>
         <table style="width:100%; margin-top:10px; border-collapse:collapse;">
-            <thead>
-                <tr style="background:#f5f5f5;">
-                    <th style="padding:10px; text-align:left; border-bottom:1px solid #ddd;">Restaurant</th>
-                    <th style="padding:10px; text-align:left; border-bottom:1px solid #ddd;">Email</th>
-                    <th style="padding:10px; text-align:left; border-bottom:1px solid #ddd;">Menu URL</th>
-                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">CSV</th>
-                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">Week</th>
-                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">Month</th>
-                    <th style="padding:10px; text-align:center; border-bottom:1px solid #ddd;">Year</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in restaurants %}
-                <tr style="border-bottom:1px solid #eee;">
-                    <td style="padding:10px;">{{ r.name }}</td>
-                    <td style="padding:10px; font-size:13px;">{{ r.email }}</td>
-                    <td style="padding:10px;">
-                        <a href="/menu/{{ r.slug }}" target="_blank">/menu/{{ r.slug }}</a>
-                    </td>
-                    <td style="padding:10px; text-align:center;">
-                        {{ '✅' if r.csv_data else '❌' }}
-                    </td>
-                    <td style="padding:10px; text-align:center;">
-                        <strong>{{ stats[r.id].weekly }}</strong>
-                    </td>
-                    <td style="padding:10px; text-align:center;">
-                        <strong>{{ stats[r.id].monthly }}</strong>
-                    </td>
-                    <td style="padding:10px; text-align:center;">
-                        <strong>{{ stats[r.id].yearly }}</strong>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:10px 0; color:#555;">Total Restaurants</td>
+                <td style="padding:10px 0;"><strong>{{ total_restaurants }}</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:10px 0; color:#555;">Active (CSV Uploaded)</td>
+                <td style="padding:10px 0;"><strong>{{ active_restaurants }}</strong></td>
+            </tr>
+            <tr>
+                <td style="padding:10px 0; color:#555;">Platform Visits This Week</td>
+                <td style="padding:10px 0;"><strong>{{ total_visits }}</strong></td>
+            </tr>
         </table>
     </div>
 
-    <a href="/logout">Logout</a>
+    {% for r in restaurants %}
+    <div class="card">
+        <div class="group-title">{{ r.name }}</div>
+        <table style="width:100%; margin-top:10px; border-collapse:collapse; font-size:14px;">
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">Email</td>
+                <td style="padding:8px 0;">{{ r.email }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">Menu URL</td>
+                <td style="padding:8px 0;">
+                    <a href="/menu/{{ r.slug }}" target="_blank">/menu/{{ r.slug }}</a>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">CSV Uploaded</td>
+                <td style="padding:8px 0;">{{ '✅' if r.csv_data else '❌' }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">Logo Uploaded</td>
+                <td style="padding:8px 0;">{{ '✅' if stats[r.id].has_logo else '❌' }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">Visits This Week</td>
+                <td style="padding:8px 0;"><strong>{{ stats[r.id].weekly }}</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">Visits This Month</td>
+                <td style="padding:8px 0;"><strong>{{ stats[r.id].monthly }}</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px 0; color:#555;">Visits This Year</td>
+                <td style="padding:8px 0;"><strong>{{ stats[r.id].yearly }}</strong></td>
+            </tr>
+            {% if stats[r.id].top_allergens %}
+            <tr>
+                <td style="padding:8px 0; color:#555;">Top Allergens</td>
+                <td style="padding:8px 0;">
+                    {% for allergen, count in stats[r.id].top_allergens %}
+                        <span style="background:#e8f0fe; color:#0d47a1; padding:2px 8px; border-radius:999px; font-size:12px; margin-right:4px;">
+                            {{ allergen | title }} ({{ count }})
+                        </span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    {% endfor %}
+
+    <a class="logout-link" href="/logout">Logout</a>
 {% endblock %}

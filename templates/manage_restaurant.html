@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}{{ restaurant.name }} — Manage{% endblock %}
+
+{% block content %}
+    <h1>{{ restaurant.name }}</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for m in messages %}<p style="color:#2d6cdf; font-weight:bold;">{{ m }}</p>{% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <a href="/dashboard" style="font-size:13px; color:#5f7494;">← Back to all restaurants</a>
+
+    <div class="card">
+        <div class="group-title">Your Menu Page</div>
+        <p>Share this link or QR code with your guests:</p>
+        <div class="menu-link">{{ menu_url }}</div>
+    </div>
+
+    <div class="card">
+        <div class="group-title">📊 Menu Analytics</div>
+        <table style="width:100%; margin-top:10px; border-collapse:collapse;">
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:10px 0; color:#555;">This week</td>
+                <td style="padding:10px 0;"><strong>{{ weekly }} visits</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:10px 0; color:#555;">This month</td>
+                <td style="padding:10px 0;"><strong>{{ monthly }} visits</strong></td>
+            </tr>
+            <tr>
+                <td style="padding:10px 0; color:#555;">This year</td>
+                <td style="padding:10px 0;"><strong>{{ yearly }} visits</strong></td>
+            </tr>
+        </table>
+        {% if top_allergens %}
+            <div class="group-title" style="margin-top:15px;">Top Selected Allergens</div>
+            <ul style="margin-top:8px; padding-left:20px;">
+                {% for allergen, count in top_allergens %}
+                    <li style="padding:4px 0; color:#555;">{{ allergen | title }} — <strong>{{ count }}</strong> times</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="margin-top:10px;">No allergen data yet.</p>
+        {% endif %}
+    </div>
+
+    {% if restaurant.csv_data %}
+        <div class="card"><p>✅ Menu already uploaded. Upload below to replace it.</p></div>
+    {% else %}
+        <div class="card"><p>⚠️ No menu uploaded yet.</p></div>
+    {% endif %}
+
+    <div class="card">
+        <div class="group-title">Upload Menu CSV</div>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="csv_files" accept=".csv"><br>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="group-title">Upload Logo</div>
+        <p>Your logo will appear in the center of your QR code.</p>
+        {% if restaurant.logo_data %}
+            <img src="{{ restaurant.logo_data }}" style="height:60px; margin-bottom:10px; border-radius:8px;"><br>
+            <p>✅ Logo uploaded.</p>
+        {% else %}
+            <p>⚠️ No logo uploaded yet.</p>
+        {% endif %}
+        <form method="POST" action="/upload-logo/{{ restaurant.slug }}" enctype="multipart/form-data">
+            <input type="file" name="logo" accept="image/*"><br>
+            <button type="submit">Upload Logo</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="group-title">Your QR Code</div>
+        <img id="qr-preview" src="/qr/{{ restaurant.slug }}?t={{ range(1,99999)|random }}"
+             style="width:200px; height:200px; border-radius:8px;">
+        <br><br>
+        <div class="group-title" style="margin-top:15px;">QR Code Colors</div>
+        <form method="POST" action="/update-qr-color/{{ restaurant.slug }}" style="margin-top:10px;"
+              onsubmit="refreshQR()">
+            <label style="font-size:13px; color:#5f7494;">QR Color</label><br>
+            <input type="color" name="qr_color" id="qr_color"
+                   value="{{ restaurant.qr_color or '#0d47a1' }}"
+                   style="width:60px; height:40px; border:none; cursor:pointer; border-radius:8px;"
+                   oninput="previewQR()">
+            <br><br>
+            <label style="font-size:13px; color:#5f7494;">Background Color</label><br>
+            <input type="color" name="qr_bg_color" id="qr_bg_color"
+                   value="{{ restaurant.qr_bg_color or '#ffffff' }}"
+                   style="width:60px; height:40px; border:none; cursor:pointer; border-radius:8px;"
+                   oninput="previewQR()">
+            <br><br>
+            <button type="submit" style="width:auto; padding:10px 20px;">Save Colors</button>
+        </form>
+        <br>
+        <a class="pill" href="/qr/{{ restaurant.slug }}" download="qr_code.png">Download QR Code</a>
+    </div>
+
+    <a class="logout-link" href="/logout">Logout</a>
+
+    <script>
+    function previewQR() {
+        const qrColor = document.getElementById('qr_color').value;
+        const bgColor = document.getElementById('qr_bg_color').value;
+        const preview = document.getElementById('qr-preview');
+        preview.style.backgroundColor = bgColor;
+        preview.style.outline = `4px solid ${qrColor}`;
+    }
+    function refreshQR() {
+        setTimeout(() => {
+            const preview = document.getElementById('qr-preview');
+            preview.src = '/qr/{{ restaurant.slug }}?t=' + Date.now();
+        }, 1000);
+    }
+    </script>
+{% endblock %}
