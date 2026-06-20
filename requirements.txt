@@ -7,3 +7,5 @@ Flask-SQLAlchemy>=3.1.1
 Flask-Login>=0.6.3
 psycopg2-binary>=2.9.9
 Flask-Mail
+qrcode[pil]
+Pillow

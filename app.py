@@ -1,14 +1,16 @@
 import os
 import io
+import base64
+import qrcode
+from PIL import Image
+from io import BytesIO
 import pandas as pd
-from flask import Flask, render_template, request, redirect, url_for, flash
+import resend
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-from flask_mail import Mail, Message
-
-
 
 app = Flask(__name__)
 from config import Config
@@ -17,7 +19,6 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-mail = Mail(app)
 
 # ── Models ──────────────────────────────────────────────
 class Restaurant(UserMixin, db.Model):
@@ -28,6 +29,7 @@ class Restaurant(UserMixin, db.Model):
     slug = db.Column(db.String(100), unique=True, nullable=False)
     csv_data = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
+    logo_data = db.Column(db.Text, nullable=True)
 
 class MenuVisit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,6 +45,11 @@ with app.app_context():
     db.create_all()
     try:
         db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN is_admin BOOLEAN DEFAULT FALSE'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+    try:
+        db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN logo_data TEXT'))
         db.session.commit()
     except:
         db.session.rollback()
@@ -91,55 +98,56 @@ def signup():
         db.session.add(restaurant)
         db.session.commit()
 
-        # send email to you
-        # send email to you
         try:
             resend.api_key = os.environ.get('RESEND_API_KEY')
 
-            # email to you
             resend.Emails.send({
                 "from": "onboarding@resend.dev",
                 "to": "jacques.calame89@gmail.com",
                 "subject": f"New Restaurant Signup — {name}",
                 "text": f"""
-        New restaurant signed up and agreed to Terms of Service:
+New restaurant signed up and agreed to Terms of Service:
 
-        Restaurant Name: {name}
-        Email: {email}
-        Signed by: {signature}
-        Date: {agreed_at}
-        Menu URL: allergens-at-restaurants.onrender.com/menu/{slug}
+Restaurant Name: {name}
+Email: {email}
+Signed by: {signature}
+Date: {agreed_at}
+Menu URL: allergens-at-restaurants.onrender.com/menu/{slug}
                 """
             })
 
-            # email to the restaurant
             resend.Emails.send({
                 "from": "onboarding@resend.dev",
                 "to": email,
                 "subject": "Welcome to the Allergen Filter App — Terms of Service Confirmation",
                 "text": f"""
-        Hi {name},
+Hi {name},
 
-        Thank you for signing up for the Allergen & Dietary Filter App.
+Thank you for signing up for the Allergen & Dietary Filter App.
 
-        This email confirms that you have read and agreed to our Terms of Service on {agreed_at}.
+This email confirms that you have read and agreed to our Terms of Service on {agreed_at}.
 
-        Signed by: {signature}
+Signed by: {signature}
 
-        Your menu page is live at:
-        allergens-at-restaurants.onrender.com/menu/{slug}
+Your menu page is live at:
+allergens-at-restaurants.onrender.com/menu/{slug}
 
-        Log in to your dashboard to upload your menu CSV and generate your QR code:
-        allergens-at-restaurants.onrender.com/login
+Log in to your dashboard to upload your menu CSV and generate your QR code:
+allergens-at-restaurants.onrender.com/login
 
-        Important reminder: You are solely responsible for the accuracy of the allergen data you upload. Please keep your menu information up to date.
+Important reminder: You are solely responsible for the accuracy of the allergen data you upload. Please keep your menu information up to date.
 
-        © 2026 All Rights Reserved
+© 2026 All Rights Reserved
                 """
             })
 
         except:
             pass
+
+        login_user(restaurant)
+        return redirect(url_for('dashboard'))
+
+    return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -252,6 +260,54 @@ def dashboard():
                            monthly=monthly,
                            yearly=yearly,
                            top_allergens=top_allergens)
+
+@app.route('/upload-logo', methods=['POST'])
+@login_required
+def upload_logo():
+    file = request.files.get('logo')
+    if file and file.filename:
+        logo_bytes = file.read()
+        logo_b64 = base64.b64encode(logo_bytes).decode('utf-8')
+        ext = file.filename.rsplit('.', 1)[-1].lower()
+        current_user.logo_data = f"data:image/{ext};base64,{logo_b64}"
+        db.session.commit()
+        flash('Logo uploaded successfully!')
+    else:
+        flash('Please upload a valid image file.')
+    return redirect(url_for('dashboard'))
+
+@app.route('/qr/<slug>')
+def generate_qr(slug):
+    restaurant = Restaurant.query.filter_by(slug=slug).first_or_404()
+    menu_url = url_for('menu', slug=slug, _external=True)
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(menu_url)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color='#0d47a1', back_color='white').convert('RGB')
+
+    if restaurant.logo_data:
+        try:
+            header, b64data = restaurant.logo_data.split(',', 1)
+            logo_bytes = base64.b64decode(b64data)
+            logo = Image.open(BytesIO(logo_bytes)).convert('RGBA')
+            qr_size = qr_img.size[0]
+            logo_size = qr_size // 4
+            logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
+            pos = ((qr_size - logo_size) // 2, (qr_size - logo_size) // 2)
+            qr_img.paste(logo, pos, mask=logo.split()[3])
+        except:
+            pass
+
+    buf = BytesIO()
+    qr_img.save(buf, format='PNG')
+    buf.seek(0)
+    return send_file(buf, mimetype='image/png')
 
 @app.route('/generate-menu', methods=['GET', 'POST'])
 @login_required
