@@ -12,11 +12,6 @@
     --orange: #f59e0b;
 }
 
-/* ── Menu Page ────────────────────────────────────────────── */
-.menu-page {
-    background: #f0ede8;  /* ← warm deep off-white */
-}
-
 /* ── Base ────────────────────────────────────────────── */
 * {
     box-sizing: border-box;

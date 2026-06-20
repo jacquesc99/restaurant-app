@@ -70,8 +70,28 @@
     </form>
   </div>
 
-  <p>Your menu link: <strong>{{ menu_url }}</strong></p>
-  <img src="https://api.qrserver.com/v1/create-qr-code/?data={{ menu_url }}&size=200x200" />
+<div class="card">
+    <div class="group-title">Upload Logo</div>
+    <p>Your logo will appear in the center of your QR code.</p>
+    {% if restaurant.logo_data %}
+      <img src="{{ restaurant.logo_data }}" style="height:60px; margin-bottom:10px; border-radius:8px;"><br>
+      <p>✅ Logo uploaded.</p>
+    {% else %}
+      <p>⚠️ No logo uploaded yet.</p>
+    {% endif %}
+    <form method="POST" action="/upload-logo" enctype="multipart/form-data">
+      <input type="file" name="logo" accept="image/*"><br>
+      <button type="submit">Upload Logo</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="group-title">Your QR Code</div>
+    <p>Your menu link: <strong>{{ menu_url }}</strong></p>
+    <img src="/qr/{{ restaurant.slug }}" style="width:200px; height:200px; border-radius:8px;">
+    <br><br>
+    <a class="pill" href="/qr/{{ restaurant.slug }}" download="qr_code.png">Download QR Code</a>
+  </div>
 
   <a class="logout-link" href="/logout">Logout</a>
 
