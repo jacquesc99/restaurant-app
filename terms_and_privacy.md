@@ -8,13 +8,13 @@
 
 ### 1. Acceptance of Terms
 
-By creating an account, accessing, or using this application ("the App"), you ("the Restaurant Operator") agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the App.
+By creating an account, accessing, or using this application ("Allergen & Dietary Filter"), you ("The Restaurant Operator") agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the App.
 
 ---
 
 ### 2. Ownership & Intellectual Property
 
-This App, including its design, code, concept, functionality, and all related materials, is the exclusive intellectual property of its creator ("the Developer"). All rights are reserved.
+This App, including its design, code, concept, functionality, and all related materials, is the exclusive intellectual property of its creator ("Jacques T. Calame, the Developer"). All rights are reserved.
 
 You may not:
 - Copy, reproduce, or replicate the concept, design, or functionality of this App
