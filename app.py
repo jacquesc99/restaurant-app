@@ -117,7 +117,7 @@ This email confirms that you have read and agreed to our Terms of Service on {ag
 Signed by: {signature}
 
 Log in to your dashboard to add your restaurants and upload your menus:
-eatwithease.onrender.com/login
+allergens-at-restaurants.onrender.com/login
 
 © 2026 All Rights Reserved
                 """
