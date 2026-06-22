@@ -1,6 +1,7 @@
 import os
 import io
 import base64
+import secrets
 import qrcode
 from PIL import Image
 from io import BytesIO
@@ -27,6 +28,8 @@ class Manager(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_verified = db.Column(db.Boolean, default=False)
+    verification_token = db.Column(db.String(100), nullable=True)
     restaurants = db.relationship('Restaurant', backref='manager', lazy=True)
 
 class Restaurant(db.Model):
@@ -38,6 +41,9 @@ class Restaurant(db.Model):
     qr_color = db.Column(db.String(20), nullable=True, default='#0d47a1')
     qr_bg_color = db.Column(db.String(20), nullable=True, default='#ffffff')
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'), nullable=True)
+    restaurant_notes = db.Column(db.Text, nullable=True)
+    is_licensed = db.Column(db.Boolean, default=False)
+    license_number = db.Column(db.String(100), nullable=True)
 
 class MenuVisit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,6 +57,31 @@ def load_user(user_id):
 
 with app.app_context():
     db.create_all()
+    try:
+        db.session.execute(db.text('ALTER TABLE manager ADD COLUMN is_verified BOOLEAN DEFAULT FALSE'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+    try:
+        db.session.execute(db.text('ALTER TABLE manager ADD COLUMN verification_token VARCHAR(100)'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+    try:
+        db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN restaurant_notes TEXT'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+    try:
+        db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN is_licensed BOOLEAN DEFAULT FALSE'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+    try:
+        db.session.execute(db.text('ALTER TABLE restaurant ADD COLUMN license_number VARCHAR(100)'))
+        db.session.commit()
+    except:
+        db.session.rollback()
 
 # ── Routes ───────────────────────────────────────────────
 
@@ -60,7 +91,7 @@ def home():
 
 @app.route('/restaurants')
 def restaurants():
-    all_restaurants = Restaurant.query.all()
+    all_restaurants = Restaurant.query.filter_by(is_licensed=True).all()
     return render_template('restaurants.html', restaurants=all_restaurants)
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -73,23 +104,33 @@ def signup():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
         signature = request.form.get('signature')
         agreed_at = datetime.utcnow().strftime('%B %d, %Y at %H:%M UTC')
+
+        if password != confirm_password:
+            flash('Passwords do not match.')
+            return redirect(url_for('signup'))
 
         if Manager.query.filter_by(email=email).first():
             flash('Email already registered.')
             return redirect(url_for('signup'))
 
+        token = secrets.token_urlsafe(32)
+
         manager = Manager(
             name=name,
             email=email,
-            password=generate_password_hash(password)
+            password=generate_password_hash(password),
+            is_verified=False,
+            verification_token=token
         )
         db.session.add(manager)
         db.session.commit()
 
         try:
             resend.api_key = os.environ.get('RESEND_API_KEY')
+
             resend.Emails.send({
                 "from": "onboarding@resend.dev",
                 "to": "jacques.calame89@gmail.com",
@@ -103,32 +144,45 @@ Signed by: {signature}
 Date: {agreed_at}
                 """
             })
+
             resend.Emails.send({
                 "from": "onboarding@resend.dev",
                 "to": email,
-                "subject": "Welcome to the Allergen Filter App — Terms of Service Confirmation",
+                "subject": "Verify your Eat with Ease account",
                 "text": f"""
 Hi {name},
 
-Thank you for signing up for the Allergen & Dietary Filter App.
+Thank you for signing up for Eat with Ease.
 
-This email confirms that you have read and agreed to our Terms of Service on {agreed_at}.
+Please verify your email address by clicking the link below:
 
-Signed by: {signature}
+https://eatwithease.onrender.com/verify/{token}
 
-Log in to your dashboard to add your restaurants and upload your menus:
-allergens-at-restaurants.onrender.com/login
+This link will activate your account.
 
-© 2026 All Rights Reserved
+© 2026 Eat with Ease
                 """
             })
+
         except:
             pass
 
-        login_user(manager)
-        return redirect(url_for('dashboard'))
+        flash('Please check your email to verify your account before logging in.')
+        return redirect(url_for('login'))
 
     return render_template('signup.html')
+
+@app.route('/verify/<token>')
+def verify_email(token):
+    manager = Manager.query.filter_by(verification_token=token).first()
+    if not manager:
+        flash('Invalid or expired verification link.')
+        return redirect(url_for('login'))
+    manager.is_verified = True
+    manager.verification_token = None
+    db.session.commit()
+    flash('Email verified! You can now log in.')
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -139,6 +193,10 @@ def login():
 
         if not manager or not check_password_hash(manager.password, password):
             flash('Invalid email or password.')
+            return redirect(url_for('login'))
+
+        if not manager.is_verified and not manager.is_admin:
+            flash('Please verify your email before logging in. Check your inbox.')
             return redirect(url_for('login'))
 
         login_user(manager, remember=True)
@@ -300,6 +358,30 @@ def add_restaurant():
 
     return render_template('add_restaurant.html')
 
+@app.route('/update-license/<slug>', methods=['POST'])
+@login_required
+def update_license(slug):
+    restaurant = Restaurant.query.filter_by(slug=slug).first_or_404()
+    if restaurant.manager_id != current_user.id:
+        flash('Access denied.')
+        return redirect(url_for('dashboard'))
+    restaurant.license_number = request.form.get('license_number', '')
+    db.session.commit()
+    flash('License number saved. Pending admin verification.')
+    return redirect(url_for('manage_restaurant', slug=slug))
+
+@app.route('/approve-license/<int:restaurant_id>', methods=['POST'])
+@login_required
+def approve_license(restaurant_id):
+    if not current_user.is_admin:
+        flash('Access denied.')
+        return redirect(url_for('dashboard'))
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    restaurant.is_licensed = True
+    db.session.commit()
+    flash(f'{restaurant.name} license approved.')
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/upload-logo/<slug>', methods=['POST'])
 @login_required
 def upload_logo(slug):
@@ -332,6 +414,18 @@ def update_qr_color(slug):
     restaurant.qr_bg_color = request.form.get('qr_bg_color', '#ffffff')
     db.session.commit()
     flash('QR code colors updated!')
+    return redirect(url_for('manage_restaurant', slug=slug))
+
+@app.route('/update-notes/<slug>', methods=['POST'])
+@login_required
+def update_notes(slug):
+    restaurant = Restaurant.query.filter_by(slug=slug).first_or_404()
+    if restaurant.manager_id != current_user.id:
+        flash('Access denied.')
+        return redirect(url_for('dashboard'))
+    restaurant.restaurant_notes = request.form.get('restaurant_notes', '')
+    db.session.commit()
+    flash('Restaurant notes updated!')
     return redirect(url_for('manage_restaurant', slug=slug))
 
 @app.route('/qr/<slug>')

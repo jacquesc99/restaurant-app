@@ -28,9 +28,70 @@
         <p>No matching dishes found.</p>
     {% endif %}
 
-    <a class="back" href="/menu/{{ restaurant.slug }}">← Back to filters</a>
+    {% if 'ambrogio' in restaurant.slug %}
+    <div id="gf-sidebar" style="
+        display:none;
+        background:#00897b;
+        border-left:6px solid #c8a96e;
+        border-radius:8px;
+        padding:16px 20px;
+        margin:16px 0 80px 0;
+        font-size:13px;
+        color:white;
+        font-style:italic;
+        animation: fadeIn 0.3s ease;
+    ">
+        <div style="font-size:28px; color:#c8a96e; line-height:1; margin-bottom:6px;">"</div>
+        <strong style="font-style:normal;">🌾 Gluten Free Crust Ingredients:</strong><br><br>
+        WATER, RICE FLOUR, POTATO STARCH, RICE STARCH, CANE SUGAR, TAPIOCA STARCH, MODIFIED RICE STARCH, POTATO FLOUR, CONTAINS LESS THAN 2% OF THE FOLLOWING: PEA FIBER, CANOLA OIL, YEAST, SALT, CELLULOSE GEL, EXTRA VIRGIN OLIVE OIL, XANTHAN GUM, CELLULOSE GUM, CULTURED BROWN RICE, BROWN RICE FLOUR, CITRIC ACID, LACTIC ACID.
+        <br><br>
+        ⚠️ <strong style="font-style:normal;">MAY CONTAIN MILK AND EGGS.</strong>
+        <div style="font-size:28px; color:#c8a96e; line-height:1; margin-top:6px; text-align:right;">"</div>
+    </div>
 
-    <p style="font-size:12px; color:#999; margin-top:20px;">
+    <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    </style>
+
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.card');
+        let showGF = false;
+        cards.forEach(card => {
+            if (card.innerText.toLowerCase().includes('gluten free') ||
+                card.innerText.toLowerCase().includes('gluten-free')) {
+                showGF = true;
+            }
+        });
+        if (showGF) {
+            document.getElementById('gf-sidebar').style.display = 'block';
+        }
+    });
+    </script>
+    {% endif %}
+
+    <p style="font-size:12px; color:#999; margin-top:20px; margin-bottom:80px;">
         ⚠️ Results are based on data provided by the restaurant and may not reflect all ingredients or preparation methods. Always confirm with your server before ordering.
     </p>
+
+    <!-- floating back button -->
+    <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:999;">
+        <a href="/menu/{{ restaurant.slug }}" style="
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            background:#1a73e8;
+            color:white;
+            font-weight:bold;
+            font-size:15px;
+            padding:12px 24px;
+            border-radius:999px;
+            text-decoration:none;
+            box-shadow:0 4px 16px rgba(0,0,0,0.2);
+        ">← Change Filters</a>
+    </div>
+
 {% endblock %}

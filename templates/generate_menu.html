@@ -4,45 +4,53 @@
 
 {% block content %}
     <h1>AI Menu Generator</h1>
-<div class="disclaimer">
-    <strong>📋 Rules for best results:</strong>
-    <ul>
-        <li>Enter one dish per line in the format: <strong>Dish Name: ingredient 1, ingredient 2, ingredient 3</strong></li>
-        <li>Include as many ingredients as possible — the more detail, the more accurate the allergen detection</li>
-        <li>If you only enter a dish name with no ingredients, the AI will make its best guess — always review before uploading</li>
-        <li>The downloaded CSV column headers must not be renamed or reordered — upload as-is</li>
-        <li>Do not add or remove columns from the downloaded CSV</li>
-        <li>TRUE means the allergen is present in the dish</li>
-        <li>FALSE means the allergen is not present</li>
-        <li>Alternatives are only shown to guests when a dish fails their filter — leave blank if no modification is possible</li>
-        <li>After downloading, open the CSV in Excel or Google Sheets to review before uploading</li>
-        <li>Once satisfied upload the CSV through your dashboard — it will replace your existing menu immediately</li>
-    </ul>
-</div>
     <p>Paste your menu below — one dish per line with its ingredients. The AI will generate a ready-to-upload CSV automatically.</p>
 
-    <p><strong>Example format:</strong></p>
-    <pre style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px;">
+    <div class="card">
+        <div class="disclaimer">
+            <strong>📋 Rules for best results:</strong>
+            <ul>
+                <li>Enter one dish per line: <strong>Dish Name: ingredient 1, ingredient 2, ingredient 3</strong></li>
+                <li>Include as many ingredients as possible — the more detail, the more accurate the allergen detection</li>
+                <li>If you only enter a dish name with no ingredients, the AI will make its best guess — always review before uploading</li>
+                <li>The downloaded CSV column headers must not be renamed or reordered — upload as-is</li>
+                <li>Do not add or remove columns from the downloaded CSV</li>
+                <li>TRUE means the allergen is present in the dish</li>
+                <li>FALSE means the allergen is not present</li>
+                <li>Alternatives are only shown to guests when a dish fails their filter — leave blank if no modification is possible</li>
+                <li>After downloading, open the CSV in Excel or Google Sheets to review before uploading</li>
+                <li>Once satisfied, upload the CSV through your dashboard — it will replace your existing menu immediately</li>
+            </ul>
+        </div>
+
+        <div class="group-title" style="margin-top:16px;">Example Format</div>
+        <pre style="background:var(--blue-light); padding:12px; border-radius:8px; font-size:13px; color:var(--blue-dark); overflow-x:auto;">
 Sausage & Porcini Pizza: pork sausage, porcini mushrooms, mozzarella, tomato, gluten crust
 Caesar Salad: romaine lettuce, parmesan, croutons, caesar dressing, anchovies
 Margherita Pizza: tomato, mozzarella, basil, gluten crust
 Tiramisu: mascarpone, eggs, espresso, ladyfingers, cocoa</pre>
 
-    <textarea id="dish-input" rows="15" style="width:100%; font-family:monospace; font-size:14px; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Paste your menu here, one dish per line..."></textarea>
+        <div class="group-title" style="margin-top:16px;">Your Menu</div>
+        <textarea id="dish-input" rows="15" style="width:100%; font-family:monospace; font-size:14px; padding:12px; border:1px solid var(--border); border-radius:8px; margin-top:8px; color:var(--text-primary);" placeholder="Paste your menu here, one dish per line..."></textarea>
 
-    <button onclick="generateCSV()">Generate CSV with AI</button>
-
-    <div id="loading" style="display:none; margin-top:20px;">
-        <p>⏳ Generating your menu CSV... this may take a moment.</p>
+        <button onclick="generateCSV()">Generate CSV with AI</button>
     </div>
 
-    <div id="result" style="display:none; margin-top:20px;">
-        <h2>Your Generated CSV</h2>
-        <p>Review the CSV below, make any edits, then download and upload to your dashboard.</p>
-        <textarea id="csv-output" rows="20" style="width:100%; font-family:monospace; font-size:13px; padding:12px; border:1px solid #ddd; border-radius:8px;"></textarea>
-        <br><br>
-        <button onclick="downloadCSV()">Download CSV</button>
-        <a href="/dashboard" class="pill" style="margin-left:10px;">← Back to Dashboard</a>
+    <div id="loading" style="display:none; margin-top:16px;">
+        <div class="card">
+            <p>⏳ Generating your menu CSV... this may take a moment.</p>
+        </div>
+    </div>
+
+    <div id="result" style="display:none; margin-top:16px;">
+        <div class="card">
+            <div class="group-title">Your Generated CSV</div>
+            <p>Review below, make any edits, then download and upload to your dashboard.</p>
+            <textarea id="csv-output" rows="20" style="width:100%; font-family:monospace; font-size:13px; padding:12px; border:1px solid var(--border); border-radius:8px; margin-top:8px; color:var(--text-primary);"></textarea>
+            <br><br>
+            <button onclick="downloadCSV()" style="width:auto; padding:10px 20px;">Download CSV</button>
+            <a href="/dashboard" class="pill" style="margin-left:10px;">← Back to Dashboard</a>
+        </div>
     </div>
 
     <script>

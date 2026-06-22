@@ -8,8 +8,6 @@
     <h1>{{ restaurant.name }}</h1>
     <p>Select your dietary restrictions and we'll show you what's safe to eat.</p>
 
-    <a class="back" href="/restaurants">← All Restaurants</a>
-
     <form method="POST">
 
         <div class="group-title">Meat Restrictions</div>
@@ -18,11 +16,51 @@
         <label class="pill"><input type="checkbox" name="allergens" value="chicken">Poultry</label>
 
         <div class="group-title">Common Allergens</div>
-        <label class="pill"><input type="checkbox" name="allergens" value="egg">Egg</label>
-        <label class="pill"><input type="checkbox" name="allergens" value="dairy">Dairy</label>
+        <label class="pill"><input type="checkbox" name="allergens" value="egg" id="egg-check">Egg</label>
+        <label class="pill"><input type="checkbox" name="allergens" value="dairy" id="dairy-check">Dairy</label>
         <label class="pill"><input type="checkbox" name="allergens" value="fish">Fish</label>
         <label class="pill"><input type="checkbox" name="allergens" value="shellfish">Shellfish</label>
-        <label class="pill"><input type="checkbox" name="allergens" value="gluten">Gluten</label>
+        <label class="pill" onclick="toggleGlutenNote()">
+            <input type="checkbox" name="allergens" value="gluten" id="gluten-check">Gluten
+        </label>
+
+        {% if 'ambrogio' in restaurant.slug %}
+        <div id="gluten-note" style="
+            display:none;
+            background:#00897b;
+            border-left:6px solid #c8a96e;
+            border-radius:8px;
+            padding:16px 20px;
+            margin:10px 0;
+            font-size:13px;
+            color:white;
+            font-style:italic;
+            animation: fadeIn 0.3s ease;
+        ">
+            <div style="font-size:28px; color:#c8a96e; line-height:1; margin-bottom:6px;">"</div>
+            <strong style="font-style:normal;">Gluten Note from Ambrogio15:</strong><br><br>
+            Although we offer gluten free pizza crust and focaccia, we are not a gluten free facility. There is a level of cross contamination that we cannot control in our standard operation, however we will do our best to accommodate every guest allergen.
+            <div style="font-size:28px; color:#c8a96e; line-height:1; margin-top:6px; text-align:right;">"</div>
+        </div>
+
+        <div id="gf-blocked-note" style="
+            display:none;
+            background:#00897b;
+            border-left:6px solid #c8a96e;
+            border-radius:8px;
+            padding:16px 20px;
+            margin:10px 0;
+            font-size:13px;
+            color:white;
+            font-style:italic;
+            animation: fadeIn 0.3s ease;
+        ">
+            <div style="font-size:28px; color:#c8a96e; line-height:1; margin-bottom:6px;">"</div>
+            <strong style="font-style:normal;">Gluten Free Crust Unavailable:</strong><br><br>
+            Our gluten free crust may contain milk and eggs and cannot be offered to guests with dairy or egg allergies.
+            <div style="font-size:28px; color:#c8a96e; line-height:1; margin-top:6px; text-align:right;">"</div>
+        </div>
+        {% endif %}
 
         <div class="group-title">Nuts & Seeds</div>
         <label class="pill"><input type="checkbox" name="allergens" value="peanuts">Peanuts</label>
@@ -40,11 +78,101 @@
         <label class="pill"><input type="checkbox" name="allergens" value="vegan">Vegan</label>
         <label class="pill"><input type="checkbox" name="allergens" value="pregnancy safe">Pregnancy Safe</label>
 
+        {% if restaurant.restaurant_notes %}
+        <div id="restaurant-note" style="
+            display:none;
+            background:#00897b;
+            border-left:6px solid #c8a96e;
+            border-radius:8px;
+            padding:16px 20px;
+            margin:10px 0;
+            font-size:13px;
+            color:white;
+            font-style:italic;
+            animation: fadeIn 0.3s ease;
+        ">
+            <div style="font-size:28px; color:#c8a96e; line-height:1; margin-bottom:6px;">"</div>
+            <strong style="font-style:normal;">Note from {{ restaurant.name }}:</strong><br><br>
+            {{ restaurant.restaurant_notes }}
+            <div style="font-size:28px; color:#c8a96e; line-height:1; margin-top:6px; text-align:right;">"</div>
+        </div>
+        {% endif %}
+
         <div class="disclaimer">
             ⚠️ <strong>Please Note:</strong> This tool is a helpful guide only and does not represent a comprehensive list of ingredients or allergens. Menu items and preparations may vary. Always inform your server of any allergies or dietary requirements before ordering. This application is not a medical resource and should not be relied upon as such.
         </div>
 
-        <button type="submit">Find Safe Dishes</button>
+        <button type="submit" style="margin-bottom:80px;">Find Safe Dishes</button>
 
     </form>
+
+    <!-- floating back button -->
+    <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:999;">
+        <a href="/restaurants" style="
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            background:#1a73e8;
+            color:white;
+            font-weight:bold;
+            font-size:15px;
+            padding:12px 24px;
+            border-radius:999px;
+            text-decoration:none;
+            box-shadow:0 4px 16px rgba(0,0,0,0.2);
+        ">← All Restaurants</a>
+    </div>
+
+    <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    </style>
+
+    <script>
+    function toggleGlutenNote() {
+        setTimeout(updateGlutenNotes, 10);
+    }
+
+    function updateGlutenNotes() {
+        const glutenChecked = document.getElementById('gluten-check').checked;
+        const eggChecked = document.getElementById('egg-check').checked;
+        const dairyChecked = document.getElementById('dairy-check').checked;
+
+        {% if 'ambrogio' in restaurant.slug %}
+        const note = document.getElementById('gluten-note');
+        const blocked = document.getElementById('gf-blocked-note');
+
+        if (!glutenChecked) {
+            note.style.display = 'none';
+            blocked.style.display = 'none';
+        } else if (eggChecked || dairyChecked) {
+            note.style.display = 'none';
+            blocked.style.display = 'block';
+        } else {
+            note.style.display = 'block';
+            blocked.style.display = 'none';
+        }
+        {% endif %}
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const egg = document.getElementById('egg-check');
+        const dairy = document.getElementById('dairy-check');
+        if (egg) egg.addEventListener('change', updateGlutenNotes);
+        if (dairy) dairy.addEventListener('change', updateGlutenNotes);
+
+        {% if restaurant.restaurant_notes %}
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                const anyChecked = document.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+                document.getElementById('restaurant-note').style.display = anyChecked ? 'block' : 'none';
+            });
+        });
+        {% endif %}
+    });
+    </script>
+
 {% endblock %}

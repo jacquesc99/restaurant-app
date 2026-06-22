@@ -3,54 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Restaurant Allergen Filter{% endblock %}</title>
+    <title>{% block title %}Eat with Ease{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#2d6cdf">
+    <meta name="theme-color" content="#1a73e8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="apple-touch-icon" href="/static/icon-192.png">
 </head>
-<div id="install-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#1a73e8; color:white; padding:14px 20px; text-align:center; font-size:14px; font-weight:bold; z-index:999;">
-    📲 Add Eat with Ease to your home screen for easy access
-    <button onclick="installApp()" style="margin-top:0; margin-left:12px; width:auto; padding:8px 16px; font-size:13px; background:white; color:#1a73e8; border-radius:20px;">Install</button>
-    <button onclick="dismissBanner()" style="margin-top:0; margin-left:8px; width:auto; padding:8px 16px; font-size:13px; background:transparent; color:white; border:1px solid white; border-radius:20px;">Not now</button>
-</div>
-
-<script>
-    let deferredPrompt;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('install-banner').style.display = 'block';
-    });
-
-    function installApp() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => {
-                deferredPrompt = null;
-                document.getElementById('install-banner').style.display = 'none';
-            });
-        }
-    }
-
-    function dismissBanner() {
-        document.getElementById('install-banner').style.display = 'none';
-    }
-</script>
 <body>
+
     {% block content %}{% endblock %}
 
     <p style="font-size:12px; color:#999; text-align:center; margin-top:40px;">
         © 2026 All Rights Reserved | <a href="/terms">Terms of Service</a>
     </p>
 
+    <div id="install-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#1a73e8; color:white; padding:14px 20px; text-align:center; font-size:14px; font-weight:bold; z-index:999;">
+        📲 Add Eat with Ease to your home screen for easy access
+        <button onclick="installApp()" style="margin-top:0; margin-left:12px; width:auto; padding:8px 16px; font-size:13px; background:white; color:#1a73e8; border-radius:20px;">Install</button>
+        <button onclick="dismissBanner()" style="margin-top:0; margin-left:8px; width:auto; padding:8px 16px; font-size:13px; background:transparent; color:white; border:1px solid white; border-radius:20px;">Not now</button>
+    </div>
+
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/service_worker.js');
         }
+
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-banner').style.display = 'block';
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    document.getElementById('install-banner').style.display = 'none';
+                });
+            }
+        }
+
+        function dismissBanner() {
+            document.getElementById('install-banner').style.display = 'none';
+        }
     </script>
+
 </body>
 </html>

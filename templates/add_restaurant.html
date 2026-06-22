@@ -11,10 +11,13 @@
         {% endif %}
     {% endwith %}
 
-    <form method="POST">
-        <input type="text" name="name" placeholder="Restaurant Name" required><br>
-        <button type="submit">Add Restaurant</button>
-    </form>
+    <div class="card">
+        <div class="group-title">Restaurant Details</div>
+        <form method="POST">
+            <input type="text" name="name" placeholder="Restaurant Name" required>
+            <button type="submit">Add Restaurant</button>
+        </form>
+    </div>
 
-    <p><a href="/dashboard">← Back to Dashboard</a></p>
+    <a href="/dashboard">← Back to Dashboard</a>
 {% endblock %}
