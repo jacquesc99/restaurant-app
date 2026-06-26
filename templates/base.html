@@ -13,16 +13,50 @@
 </head>
 <body>
 
+    <div style="text-align:center; padding:8px 0 4px 0;">
+        <select onchange="translatePage(this.value)" style="font-size:13px; padding:4px 8px; border:1px solid var(--border); border-radius:8px; color:var(--text-secondary); background:var(--card-bg); cursor:pointer;">
+            <option value="">🌐 Language</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Español (Spanish)</option>
+            <option value="pt">🇧🇷 Português (Portuguese)</option>
+            <option value="it">🇮🇹 Italiano (Italian)</option>
+        </select>
+    </div>
+
     <div style="text-align:center; padding:16px 0 8px 0; margin-bottom:8px;">
         <a href="/" style="text-decoration:none;">
-            <span style="font-size:20px; font-weight:bold; color:var(--blue-dark); letter-spacing:1px;">Eat with Ease</span>
+            <span style="font-size:20px; font-weight:bold; color:var(--blue-dark); letter-spacing:1px;">Eat with Ease™</span>
             <span style="font-size:12px; color:var(--text-secondary); display:block; margin-top:2px; font-weight:normal; letter-spacing:0;">A helpful dietary tool</span>
         </a>
     </div>
 
     {% block content %}{% endblock %}
 
-    <p style="font-size:12px; color:#999; text-align:center; margin-top:40px;">
+    <div style="text-align:center; padding:24px 0 8px 0;">
+        <a onclick="showInstallHelp()" style="cursor:pointer; text-decoration:none; display:inline-block;">
+            <img src="/static/icon-192.png" style="width:120px; height:120px;">
+            <p style="font-size:13px; color:var(--blue-primary); font-weight:bold; margin-top:6px;">📲 Add me as an app</p>
+        </a>
+    </div>
+
+    <div id="install-help" style="display:none; background:#0a3d91; border-radius:12px; padding:20px; margin:12px 0; color:white;">
+        <div style="font-size:18px; font-weight:bold; margin-bottom:12px;">📲 Install Eat with Ease</div>
+        <div style="margin-bottom:16px;">
+            <strong>🤖 Android (Chrome):</strong><br>
+            Tap the <strong>3 dots menu</strong> in the top right → tap <strong>"Add to Home screen"</strong> → tap <strong>Add</strong>
+        </div>
+        <div style="margin-bottom:16px;">
+            <strong>🍎 iPhone / iPad (Safari):</strong><br>
+            Tap the <strong>Share button</strong> (box with arrow) at the bottom → scroll down and tap <strong>"Add to Home Screen"</strong> → tap <strong>Add</strong>
+        </div>
+        <div style="margin-bottom:16px;">
+            <strong>💻 Desktop (Chrome):</strong><br>
+            Look for the <strong>install icon</strong> (➕) in the address bar on the right → click it → click <strong>Install</strong>
+        </div>
+        <a onclick="document.getElementById('install-help').style.display='none'" style="font-size:13px; color:#c8a96e; cursor:pointer; font-weight:bold;">✕ Close</a>
+    </div>
+
+    <p style="font-size:12px; color:#999; text-align:center; margin-top:8px;">
         © 2026 All Rights Reserved | <a href="/terms">Terms of Service</a>
     </p>
 
@@ -57,6 +91,20 @@
 
         function dismissBanner() {
             document.getElementById('install-banner').style.display = 'none';
+        }
+
+        function showInstallHelp() {
+            const el = document.getElementById('install-help');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function translatePage(lang) {
+            if (!lang || lang === 'en') {
+                window.location.href = window.location.href.split('?')[0];
+                return;
+            }
+            const url = `https://translate.google.com/translate?sl=en&tl=${lang}&u=${encodeURIComponent(window.location.href)}`;
+            window.location.href = url;
         }
     </script>
 
